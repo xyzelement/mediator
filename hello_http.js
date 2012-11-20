@@ -4,8 +4,6 @@ app = express();
 var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy;
 
- 
-//Todo: figure out what all of these actually are 
 app.use(express.cookieParser());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
@@ -80,28 +78,25 @@ passport.use(new LocalStrategy(
   }
 ));
   
-
-  
- app.get('/', ensureAuthenticated, function(req, res){
-  res.redirect('/read');
-});
-  
-
-  
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/content/first.html')
 }  
   
-//TODOfigure out this failureflash  
-app.get('/login', 	
+ app.get('/', ensureAuthenticated, function(req, res){
+  res.redirect('/read');
+});
+  
+  
+app.get('/login', 	//TODOfigure out this failureflash  
   passport.authenticate('local', { failureRedirect: '/content/first.html', 
 								   failureFlash: false }),  
 								   function(req, res) {
 										res.redirect('/');
-								  });
-
-app.get('/read', function (req, res) {    
+								  });						  
+								  
+app.get('/read', ensureAuthenticated, function(req, res){
+	console.log(req.user);
 	db.arguments.find({}, function(err, users) {
 		res.writeHead(200, { 'Content-Type': 'text/html', 'Trailer': 'Content-MD5' });
 	
@@ -117,7 +112,7 @@ app.get('/read', function (req, res) {
 	});
 });
 
-app.post('/add', function (req, res) {    
+app.post('/add', ensureAuthenticated, function(req, res){   
 	if(req.body.name.length === 0 || req.body.says.length === 0) {
 		res.redirect('/read?alert=You probably want to say something here right now');
 		return;
