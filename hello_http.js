@@ -1,30 +1,29 @@
-var doT = require('dot')
-var fs = require('fs');
 var express = require("express");
-
-
 app = express(); 
-var data_template = "";
-
 app.use(express.static(__dirname + '/public'));
 
+
+var data_template = "";
+var fs = require('fs');
 fs.readFile( __dirname + '/public/content/second.html', function (err, data) {
   if (err) { throw err; }
   data_template = doT.template(data.toString());
 });
 
 
-function apply_template_to_history() {	
-	return data_template([ 	{name: 'ed',   says: 'I think you suck'}, 
-							{name: 'josh', says: 'Yeah I think you are right.' }]);
-}
-
-
+var doT = require('dot')
+var db = require('mongojs').connect('mydb', ['arguments']);
 app.get('/', function(req, res) {
-  res.writeHead(200, { 'Content-Type': 'text/html',
-                          'Trailer': 'Content-MD5' });
 
-  res.end(apply_template_to_history());
+	db.arguments.find({}, function(err, users) {
+		res.writeHead(200, { 'Content-Type': 'text/html', 'Trailer': 'Content-MD5' });
+	
+		if( err || !users) 	{ 
+			res.end("Oops. No data found");
+		} else {
+			res.end(data_template(users));
+		}
+	});
 });
 
 app.listen(8080);
