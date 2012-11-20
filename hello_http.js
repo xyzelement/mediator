@@ -13,26 +13,34 @@ fs.readFile( __dirname + '/public/content/second.html', function (err, data) {
 });
 
 
+
 var doT = require('dot')
 var db = require('mongojs').connect('mydb', ['arguments']);
-app.get('/', function(req, res) {
-
+app.get('/', function (req, res) {    
 	db.arguments.find({}, function(err, users) {
 		res.writeHead(200, { 'Content-Type': 'text/html', 'Trailer': 'Content-MD5' });
 	
 		if( err || !users) 	{ 
 			res.end("Oops. No data found");
 		} else {
-			res.end(data_template(users));
+			var obj={
+				argument: users,
+				alert: req.query["alert"]
+			};			
+			res.end(data_template(obj));
 		}
 	});
 });
 
 app.post('/add', function (req, res) {    
+	if(req.body.name.length === 0 || req.body.says.length === 0) {
+		res.redirect('/?alert=You probably want to say something here right now');
+		return;
+	}
+
 	db.arguments.save({name: req.body.name, says: req.body.says}, 
 		function(err, saved) {
 			if( err || !saved ) console.log("User not saved");
-			else console.log("User saved");
 			res.redirect('/');
 		});
 });

@@ -15,6 +15,11 @@
         padding-top: 60px;
         padding-bottom: 40px;
       }
+      /* Custom container */
+      .container-narrow {
+        margin: 0 auto;
+        max-width: 700px;
+      }	  
     </style>
     <link href="../assets/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -49,31 +54,45 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container-narrow">
 
       <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="hero-unit">
+      <!-- <div class="hero-unit"> -->
         <h1>Fight!</h1>
-        <p>Here's your argument so far.</p>
+        <legend>The discussion thus far</legend>
 
 		
-{{ for(var prop in it) { }}
-<div class="well"><b>{{=it[prop].name}}</b> {{=it[prop].says}}</div>
-{{ } }}
+		{{ for(var prop in it.argument) { }}
+		<div class="11well well-small">
 
+			{{? it.argument[prop].name == "Ed"}}
+				<span class="label label-info">{{=it.argument[prop].name}}</span>
+			{{??}}
+				<span class="label">{{=it.argument[prop].name}}</span>
+			{{?}}
+			
+			&nbsp; {{=it.argument[prop].says}}
+		</div>
+		{{ } }}
+
+		</br></br>
+	<div class="hero-unit">
 
 <form class="form-search" method="post" action="add">
+	<legend>Your Response:</legend>
+
+	{{? it.alert }}
+	<div class="alert">
+	  <strong>Oops!</strong> {{=it.alert}}
+	</div>
+	{{?}}
+
 	<input name="name" type="text" placeholder="I am" class="input-medium search-query">
     <input name="says" type="text" placeholder="here's how I feel..." class="input-medium search-query">
-    <button type="submit" class="btn">Submit</button>
+    <button type="submit" class="btn btn-info">Submit</button>
 </form>
-
-      </div>
-	  
-
-	  
-
-
+	</div>
+	
       <hr>
 
       <footer>
