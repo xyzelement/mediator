@@ -1,10 +1,12 @@
 var express = require("express");
 app = express(); 
 app.use(express.static(__dirname + '/public'));
-
+app.use(express.bodyParser());
 
 var data_template = "";
 var fs = require('fs');
+// TODO: you'll probably want to include an 'encoding' to fs.readFile (utf8 works)
+// TODO: 'readFileSync'
 fs.readFile( __dirname + '/public/content/second.html', function (err, data) {
   if (err) { throw err; }
   data_template = doT.template(data.toString());
@@ -24,6 +26,15 @@ app.get('/', function(req, res) {
 			res.end(data_template(users));
 		}
 	});
+});
+
+app.post('/add', function (req, res) {    
+	db.arguments.save({name: req.body.name, says: req.body.says}, 
+		function(err, saved) {
+			if( err || !saved ) console.log("User not saved");
+			else console.log("User saved");
+			res.redirect('/');
+		});
 });
 
 app.listen(8080);

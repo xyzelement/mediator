@@ -55,13 +55,21 @@
       <div class="hero-unit">
         <h1>Fight!</h1>
         <p>Here's your argument so far.</p>
+
 		
 {{ for(var prop in it) { }}
 <div class="well"><b>{{=it[prop].name}}</b> {{=it[prop].says}}</div>
 {{ } }}
 
 
+<form class="form-search" method="post" action="add">
+	<input name="name" type="text" placeholder="I am" class="input-medium search-query">
+    <input name="says" type="text" placeholder="here's how I feel..." class="input-medium search-query">
+    <button type="submit" class="btn">Submit</button>
+</form>
+
       </div>
+	  
 
 	  
 
