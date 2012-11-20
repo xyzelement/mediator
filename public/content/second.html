@@ -65,7 +65,7 @@
 		{{ for(var prop in it.argument) { }}
 		<div class="11well well-small">
 
-			{{? it.argument[prop].name == "Ed"}}
+			{{? it.argument[prop].name == it.current_user}}
 				<span class="label label-info">{{=it.argument[prop].name}}</span>
 			{{??}}
 				<span class="label">{{=it.argument[prop].name}}</span>
