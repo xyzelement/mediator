@@ -3,8 +3,6 @@ var users = require("./user_stuff");
 var express = require("express");
 app = express();
 
-
-
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 
@@ -35,22 +33,13 @@ fs.readFile(__dirname + '/public/content/user.html', function (err, data) {
 
 var doT = require('dot')
 
-
-
-passport.serializeUser(function (user, done) {
-	done(null, user.id);
-});
-
-passport.deserializeUser(function (id, done) {
-	users.findById(id, function (err, user) {
-		done(err, user);
-	});
-});
+passport.serializeUser(function (user, done) { done(null, user.id);  });
+passport.deserializeUser(function (id, done) { users.findById(id, function (err, user) { done(err, user); }); });
 
 passport.use(new LocalStrategy(
 		function (username, password, done) {
 		users.findByUsername(username, function (err, user) {
-			if (err) { return done(err); }
+			if (err)                       { return done(err); }
 			if (!user)                     { return done(null, false, { message : 'Unknown user ' + username });}
 			if (user.password != password) { return done(null, false, { message : 'Invalid password' }); }
 			return done(null, user);
@@ -67,13 +56,13 @@ app.get('/', ensureAuthenticated, function (req, res) {
 });
 
 app.get('/login', //TODOfigure out this failureflash
-	passport.authenticate('local', {
-		failureRedirect : '/content/login.html',
-		failureFlash : false
-	}),
+	passport.authenticate('local', 
+  { failureRedirect : '/content/login.html',
+		failureFlash : false }),
 	function (req, res) {
-	res.redirect('/');
-});
+    res.redirect('/');
+  }
+);
 
 app.get('/logout', function(req, res){
   req.logout();
@@ -146,5 +135,4 @@ app.post('/add', ensureAuthenticated, function (req, res) {
 });
 
 
-var server = require('http').createServer(app);
-server.listen(8080);
+require('http').createServer(app).listen(8080);

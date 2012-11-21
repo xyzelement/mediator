@@ -27,6 +27,10 @@ var db = require('mongojs').connect(mongourl, ['topics', 'arguments']);
 
 exports.db = db;
 
+
+
+
+
 exports.load_topics_for_user = function (user, fail, cb) {
 	exports.db.topics.find({ $or : [ {from: user}, { to: user}   ]}, function (err, entries) {
 		if (err || !entries) {
@@ -75,6 +79,7 @@ exports.create_topic = function(from, to, topic, fail, cb) {
     } 
     if (usr.username == from) {
       fail('Cannot argue with self');
+      return;
     } 
       
     var t = {
