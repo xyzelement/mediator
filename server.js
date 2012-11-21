@@ -115,6 +115,14 @@ app.get('/read', ensureAuthenticated, function (req, res) {
 	});
 });
 
+app.get('/remove', ensureAuthenticated, function (req, res) {
+  if (req.user.username != 'ed') {
+    res.end("only ed can do this");
+    return;
+  }
+  db.delete_everything( function() {res.redirect('/');}) ;
+
+});
 
 app.post('/add', ensureAuthenticated, function (req, res) {
   var conv = {

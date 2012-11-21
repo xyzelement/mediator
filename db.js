@@ -91,3 +91,9 @@ exports.create_topic = function(from, to, topic, fail, cb) {
     cb();
   })
 }
+
+exports.delete_everything = function(cb) {
+  exports.db.topics.remove();
+  exports.db.arguments.remove();
+  cb();
+}
