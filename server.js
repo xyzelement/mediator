@@ -1,7 +1,50 @@
+// https://docs.appfog.com/languages/node
+// TODO: use the above to hook into the production mondodb
+
 var users = require("./user_stuff");
 
 var express = require("express");
 app = express();
+
+var mongo;
+app.configure('development', function(){
+    mongo = {
+        "hostname":"localhost",
+        "port":27017,
+        "username":"",
+        "password":"",
+        "name":"",
+        "db":"db"
+    }
+});
+app.configure('production', function(){
+    var env = JSON.parse(process.env.VCAP_SERVICES);
+    mongo = env['mongodb-1.8'][0]['credentials'];
+});
+
+var generate_mongo_url = function(obj){
+    obj.hostname = (obj.hostname || 'localhost');
+    obj.port = (obj.port || 27017);
+    obj.db = (obj.db || 'test');
+    if(obj.username && obj.password){
+        return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
+    }else{
+        return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
+    }
+}
+
+var mongourl = generate_mongo_url(mongo);
+
+var db = require('mongojs').connect('mydb', ['topics', 'arguments']);
+//var db = require('mongojs').connect(mongourl, ['topics', 'arguments']);
+
+
+
+
+
+
+
+
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -32,7 +75,8 @@ fs.readFile(__dirname + '/public/content/user.html', function (err, data) {
 });
 
 var doT = require('dot')
-	var db = require('mongojs').connect('mydb', ['topics', 'arguments']);
+
+
 
 passport.serializeUser(function (user, done) {
 	done(null, user.id);
