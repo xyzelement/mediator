@@ -1,7 +1,7 @@
 
 users = [
-   { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
- , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
+   { id: 1, username: 'bob', password: 'bob', email: 'bob@example.com' }
+ , { id: 2, username: 'joe', password: 'joe', email: 'joe@example.com' }
  , { id: 3, username: 'ed', password: 'ed', email: 'ed@example.com' }
 ];
 

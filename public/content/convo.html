@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
+    <title>Mediator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -46,7 +46,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">The Mediator</a>
+          <a class="brand" href="/">The Mediator</a>
         </div>
 	  </div>
 	</div>
@@ -58,7 +58,7 @@
 
       <!-- Main hero unit for a primary marketing message or call to action -->
       <!-- <div class="hero-unit"> -->
-        <h1>Fight!</h1>
+        <h1>{{=it.topic}}</h1>
         <legend>The discussion thus far</legend>
 
 		
@@ -87,8 +87,9 @@
 	</div>
 	{{?}}
 
-	<input name="name" type="text" placeholder="I am" class="input-medium search-query">
-    <input name="says" type="text" placeholder="here's how I feel..." class="input-medium search-query">
+	<!-- <input name="name" type="text" placeholder="I am" class="input-medium search-query"> -->
+    <input name="topic" type="hidden" value="{{=it.topic}}"/>
+    <input name="says" type="text" placeholder="here's how I feel..." class="input-medium search-query"/>
     <button type="submit" class="btn btn-info">Submit</button>
 </form>
 	</div>
