@@ -1,48 +1,7 @@
-// https://docs.appfog.com/languages/node
-// TODO: use the above to hook into the production mondodb
-
 var users = require("./user_stuff");
 
 var express = require("express");
 app = express();
-
-var mongo;
-app.configure('development', function(){
-    mongo = {
-        "hostname":"localhost",
-        "port":27017,
-        "username":"",
-        "password":"",
-        "name":"",
-        "db":"mydb"
-    }
-});
-app.configure('production', function(){
-    var env = JSON.parse(process.env.VCAP_SERVICES);
-    mongo = env['mongodb-1.8'][0]['credentials'];
-});
-
-var generate_mongo_url = function(obj){
-    obj.hostname = (obj.hostname || 'localhost');
-    obj.port = (obj.port || 27017);
-    obj.db = (obj.db || 'test');
-    if(obj.username && obj.password){
-        return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
-    }else{
-        return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
-    }
-}
-
-var mongourl = generate_mongo_url(mongo);
-
-//var db = require('mongojs').connect('mydb', ['topics', 'arguments']);
-var db = require('mongojs').connect(mongourl, ['topics', 'arguments']);
-
-
-
-
-
-
 
 
 
@@ -99,9 +58,7 @@ passport.use(new LocalStrategy(
 	}));
 
 function ensureAuthenticated(req, res, next) {
-	if (req.isAuthenticated()) {
-		return next();
-	}
+	if (req.isAuthenticated()) { return next(); }
 	res.redirect('/content/login.html')
 }
 
@@ -124,62 +81,41 @@ app.get('/logout', function(req, res){
 });
 
 
+var db = require('./db');
+
 app.get('/user', ensureAuthenticated, function (req, res) {
-	db.topics.find({ $or : [ {from: req.user.username}, { to:   req.user.username}   ]}, function (err, entries) { //TODO: keys
-		res.writeHead(200, {'Content-Type' : 'text/html',	'Trailer' : 'Content-MD5'	});
-		
-		if (err || !entries) {
-			res.end("Oops. No data found");
-		} else {
-			var obj = {
-				topics : entries,
-				alert : req.query["alert"],
-        current_user: req.user.username			};
-			res.end(user_template(obj));
-		}
-	});
+  db.load_topics_for_user(
+    req.user.username,
+    function(err)     {  console.log('error loading convo for user' + err) },
+    function(entries) {  res.end(user_template({ topics       : entries,
+                                                 alert        : req.query["alert"],
+                                                 current_user : req.user.username    }));
+    }
+  );  
 });
+
 
 app.post('/start', ensureAuthenticated, function (req, res) {
-	if (req.body.with.length === 0) {
-		res.redirect('/user?alert=Please specify a user');
-		return;
-	}
-	if (req.body.says.length === 0) {
-		res.redirect('/user?alert=Please say something');
-		return;
-	}	
-  
-  users.findByUsername(req.body.with, function (err, usr) {
-    if(!usr) {
-      res.redirect('/user?alert=invalid user');
-    } else if (usr.username == req.user.username) {
-      res.redirect('/user?alert=Cannot argue with self');
-    } else {
-      var t = {
-        topic: req.body.says,
-        from:  req.user.username,
-        to:    usr.username
-      }
-      db.topics.save(t);
-      res.redirect('/read?topic='+req.body.says);
-    }
-  })
-
+  db.create_topic(
+              req.user.username, // from
+              req.body.with,     // to
+              req.body.says,     // topic
+              function(err) {
+                res.redirect('/user?alert='+err);
+              },
+              function() {
+                res.redirect('/read?topic='+req.body.says);                
+              });
 });
 
-app.get('/read', ensureAuthenticated, function (req, res) {
 
-  if(!req.query["topic"] || req.query["topic"].length==0) {
-    res.redirect('/user');
-    return;
-  }
-	db.arguments.find({topic: req.query["topic"]}, function (err, entries) {
-		res.writeHead(200, {'Content-Type' : 'text/html',	'Trailer' : 'Content-MD5'	});
-		
-		if (err || !entries) {
-			res.end("Oops. No data found");
-		} else {
+app.get('/read', ensureAuthenticated, function (req, res) {
+  db.load_arguments_for_topic(req.query["topic"], 
+    function (err) { 
+      console.log("Failed to load convos:" + err);  
+      res.redirect('/user');
+    }, 
+    function (entries) {
 			var obj = {
         topic:        req.query["topic"],
 				argument :    entries,
@@ -187,26 +123,26 @@ app.get('/read', ensureAuthenticated, function (req, res) {
         current_user: req.user.username
 			};
 			res.end(convo_template(obj));
-		}
 	});
 });
 
+
 app.post('/add', ensureAuthenticated, function (req, res) {
-	if (req.body.says.length === 0) {
-		res.redirect('/read?topic='+req.body.topic+'&alert=You probably want to say something here right now');
-		return;
-	}
-	
-	db.arguments.save(
-    {
+  var conv = {
      topic: req.body.topic,
      id:    req.user.id, 
      name : req.user.username, 
-     says : req.body.says},
-		function (err, saved) {		
-      if (err || !saved) { console.log("User not saved"); }    
-      res.redirect('/read?topic='+req.body.topic);
-    });
+     says : req.body.says  
+  };
+
+  db.add_argument(conv, 
+      function (fail_text) {
+        res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
+      },
+      function (err, saved) {		
+        if (err || !saved) { console.log("User not saved"); }    
+        res.redirect('/read?topic='+req.body.topic);
+      });
 });
 
 
