@@ -93,7 +93,13 @@ app.post('/start', ensureAuthenticated, function (req, res) {
                 res.redirect('/user?alert='+err);
               },
               function() {
-                res.redirect('/read?topic='+req.body.says);                
+                db.add_argument(req.body.says, req.user.username, req.body.says,
+                function (fail_text) {
+                  res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
+                },
+                function () {		        
+                  res.redirect('/read?topic='+req.body.says);
+                });
               });
 });
 
@@ -125,19 +131,11 @@ app.get('/remove', ensureAuthenticated, function (req, res) {
 });
 
 app.post('/add', ensureAuthenticated, function (req, res) {
-  var conv = {
-     topic: req.body.topic,
-     id:    req.user.id, 
-     name : req.user.username, 
-     says : req.body.says  
-  };
-
-  db.add_argument(conv, 
+  db.add_argument(req.body.topic, req.user.username, req.body.says,
       function (fail_text) {
         res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
       },
-      function (err, saved) {		
-        if (err || !saved) { console.log("User not saved"); }    
+      function () {		        
         res.redirect('/read?topic='+req.body.topic);
       });
 });

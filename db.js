@@ -28,9 +28,6 @@ var db = require('mongojs').connect(mongourl, ['topics', 'arguments']);
 exports.db = db;
 
 
-
-
-
 exports.load_topics_for_user = function (user, fail, cb) {
 	exports.db.topics.find({ $or : [ {from: user}, { to: user}   ]}, function (err, entries) {
 		if (err || !entries) {
@@ -41,12 +38,18 @@ exports.load_topics_for_user = function (user, fail, cb) {
 	});
 }
 
-exports.add_argument = function(convo, fail, cb) {
-	if (convo.says.length === 0) {
+exports.add_argument = function(topic, username, says, fail, cb) {
+	if (says.length === 0) {
     fail("You probably want to say something here");		
 		return;
 	}
-  exports.db.arguments.save(convo, cb);
+  exports.db.arguments.save({ topic: topic, username: username, says: says}, function(err, saved) {
+    if (err || !saved) { 
+      fail("User not saved"); 
+      return;
+    }    
+    cb();
+  });
 }
 
 exports.load_arguments_for_topic = function(topic, fail, cb) {
