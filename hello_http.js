@@ -118,14 +118,13 @@ app.post('/start', ensureAuthenticated, function (req, res) {
         to:    usr.username
       }
       db.topics.save(t);
-      res.redirect('/user?alert=that works');
+      res.redirect('/read?topic='+req.body.says);
     }
   })
 
 });
 
 app.get('/read', ensureAuthenticated, function (req, res) {
-
 
   if(!req.query["topic"] || req.query["topic"].length==0) {
     res.redirect('/user');
