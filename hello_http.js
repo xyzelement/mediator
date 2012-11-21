@@ -75,7 +75,7 @@ app.get('/login', //TODOfigure out this failureflash
 });
 
 app.get('/user', ensureAuthenticated, function (req, res) {
-	db.topics.find({}, function (err, entries) { //TODO: keys
+	db.topics.find({ $or : [ {from: req.user.username}, { to:   req.user.username}   ]}, function (err, entries) { //TODO: keys
 		res.writeHead(200, {'Content-Type' : 'text/html',	'Trailer' : 'Content-MD5'	});
 		
 		if (err || !entries) {
