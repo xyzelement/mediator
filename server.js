@@ -14,7 +14,7 @@ app.configure('development', function(){
         "username":"",
         "password":"",
         "name":"",
-        "db":"db"
+        "db":"mydb"
     }
 });
 app.configure('production', function(){
@@ -35,8 +35,8 @@ var generate_mongo_url = function(obj){
 
 var mongourl = generate_mongo_url(mongo);
 
-var db = require('mongojs').connect('mydb', ['topics', 'arguments']);
-//var db = require('mongojs').connect(mongourl, ['topics', 'arguments']);
+//var db = require('mongojs').connect('mydb', ['topics', 'arguments']);
+var db = require('mongojs').connect(mongourl, ['topics', 'arguments']);
 
 
 
