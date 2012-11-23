@@ -1,10 +1,12 @@
 var users = require("./user_stuff");
-
+var util = require("util");
 var express = require("express");
 app = express();
 
+var util = require('util');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
 
 app.use(express.cookieParser());
 app.use(express.bodyParser());
@@ -33,18 +35,39 @@ fs.readFile(__dirname + '/public/content/user.html', function (err, data) {
 
 var doT = require('dot')
 
-passport.serializeUser(function (user, done) { done(null, user.id);  });
-passport.deserializeUser(function (id, done) { users.findById(id, function (err, user) { done(err, user); }); });
+passport.serializeUser(function(user, done)  { done(null, user); });
+passport.deserializeUser(function(obj, done) { done(null, obj);  });
 
-passport.use(new LocalStrategy(
-		function (username, password, done) {
-		users.findByUsername(username, function (err, user) {
-			if (err)                       { return done(err); }
-			if (!user)                     { return done(null, false, { message : 'Unknown user ' + username });}
-			if (user.password != password) { return done(null, false, { message : 'Invalid password' }); }
-			return done(null, user);
-		})
-	}));
+var FACEBOOK_APP_ID = "103675439800589"
+var FACEBOOK_APP_SECRET = "6c8a1a9718008bbcca258af962e322c6";
+
+
+
+passport.use(new FacebookStrategy({
+    clientID: FACEBOOK_APP_ID,
+    clientSecret: FACEBOOK_APP_SECRET,
+    callbackURL: "http://localhost:8080/fbcb"
+  },
+  function(accessToken, refreshToken, profile, done) {
+	  console.log("Token:" + accessToken);
+      //console.log(util.inspect(profile));
+      return done(null, profile);
+  }
+));
+
+
+app.get('/fb',
+  passport.authenticate('facebook'),
+  function(req, res){
+    // The request will be redirected to Facebook for authentication, so this
+    // function will not be called.
+  });
+
+app.get('/fbcb', 
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  });
 
 function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) { return next(); }
@@ -52,16 +75,20 @@ function ensureAuthenticated(req, res, next) {
 }
 
 app.get('/', ensureAuthenticated, function (req, res) {
+	console.log("/ called");
 	res.redirect('/user');
 });
 
 app.get('/login', //TODOfigure out this failureflash
+	function (req, res) {
+	console.log("login called");
 	passport.authenticate('local', 
   { failureRedirect : '/content/login.html',
 		failureFlash : false }),
 	function (req, res) {
     res.redirect('/');
   }
+	}
 );
 
 app.get('/logout', function(req, res){
@@ -72,11 +99,21 @@ app.get('/logout', function(req, res){
 
 var db = require('./db');
 
+
 app.get('/user', ensureAuthenticated, function (req, res) {
+
+  var facebook = require('./facebook');
+    facebook.get('AAABeStHC4Q0BAEfuoj8AoIlEfrPhvCZBPLFSYIyoqGqA9ENdX6GMRy0Ih021LYdcfBNZCIXizwmOu0EsA72e0AKCwcxEhVvhBc4ZACImwZDZD', 
+    '/ed.markovich/', function(data){
+      console.log(data);
+  });
+  
   db.load_topics_for_user(
     req.user.username,
     function(err)     {  console.log('error loading convo for user' + err) },
-    function(entries) {  res.end(user_template({ topics       : entries,
+    function(entries) {  res.end(user_template({ 
+                                                 user         : req.user,
+                                                 topics       : entries,
                                                  alert        : req.query["alert"],
                                                  current_user : req.user.username    }));
     }
@@ -105,6 +142,7 @@ app.post('/start', ensureAuthenticated, function (req, res) {
 
 
 app.get('/read', ensureAuthenticated, function (req, res) {
+  console.log("read called");
   db.load_arguments_for_topic(req.query["topic"], 
     function (err) { 
       console.log("Failed to load convos:" + err);  
