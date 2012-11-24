@@ -67,32 +67,17 @@ exports.load_arguments_for_topic = function(topic, fail, cb) {
 }
 
 exports.create_topic = function(from, to, topic, fail, cb) {
-	if (to.length === 0) {
-		fail("Please specify a user");
-		return;
-	}
-	if (topic.length === 0) {
-		fail("Please say something");
-		return;
-	}	
-  users.findByUsername(to, function (err, usr) {
-    if(!usr) {
-      fail('invalid user');
-      return;
-    } 
-    if (usr.username == from) {
-      fail('Cannot argue with self');
-      return;
-    } 
+	if (to.length === 0)    { fail("Please specify a user"); return; }
+	if (topic.length === 0) {	fail("Please say something");  return; }	
       
-    var t = {
+  var t = {
         topic: topic,
         from:  from,
         to:    to
-    }
-    exports.db.topics.save(t);
-    cb();
-  })
+  }
+  
+  exports.db.topics.save(t);
+  cb();
 }
 
 exports.delete_everything = function(cb) {

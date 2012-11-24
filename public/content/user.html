@@ -63,8 +63,11 @@
 
       <!-- Main hero unit for a primary marketing message or call to action -->
       <!-- <div class="hero-unit"> -->
-        <img src="https://graph.facebook.com/{{=it.user.id}}/picture" />
-        <h1>Fight!</h1>
+        
+        <h1><img src="https://graph.facebook.com/{{=it.user.id}}/picture" /> {{=it.user.displayName}}</h1>
+        
+        {{=it.user.token}}
+        
         <legend>Arguments you are in</legend>
 
 		
@@ -93,8 +96,13 @@
   </div>
 
   <div class="control-group">
-    <input name="with" type="text" placeholder="argue with..." class="input-medium search-query">
+    <input name="with" type="text" placeholder="argue with..." class="input-medium search-query" data-provide="typeahead" data-items="4" 
+   
+    data-source='{{=it.friends}}'>
     </div>
+    
+    
+    
   <div class="control-group">  
     <textarea rows="3" name="says"></textarea>
     </div>
@@ -117,18 +125,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="../assets/js/jquery.js"></script>
-    <script src="../assets/js/bootstrap-transition.js"></script>
-    <script src="../assets/js/bootstrap-alert.js"></script>
-    <script src="../assets/js/bootstrap-modal.js"></script>
-    <script src="../assets/js/bootstrap-dropdown.js"></script>
-    <script src="../assets/js/bootstrap-scrollspy.js"></script>
-    <script src="../assets/js/bootstrap-tab.js"></script>
-    <script src="../assets/js/bootstrap-tooltip.js"></script>
-    <script src="../assets/js/bootstrap-popover.js"></script>
-    <script src="../assets/js/bootstrap-button.js"></script>
-    <script src="../assets/js/bootstrap-collapse.js"></script>
-    <script src="../assets/js/bootstrap-carousel.js"></script>
-    <script src="../assets/js/bootstrap-typeahead.js"></script>
+    <script src="../assets/js/bootstrap.js"></script>
 
   </body>
 </html>

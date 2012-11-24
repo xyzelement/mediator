@@ -1,4 +1,5 @@
 var users = require("./user_stuff");
+var conf = require("./config.js");
 var util = require("util");
 var express = require("express");
 app = express();
@@ -38,20 +39,18 @@ var doT = require('dot')
 passport.serializeUser(function(user, done)  { done(null, user); });
 passport.deserializeUser(function(obj, done) { done(null, obj);  });
 
-var FACEBOOK_APP_ID = "103675439800589"
-var FACEBOOK_APP_SECRET = "6c8a1a9718008bbcca258af962e322c6";
+
 
 
 
 passport.use(new FacebookStrategy({
-    clientID: FACEBOOK_APP_ID,
-    clientSecret: FACEBOOK_APP_SECRET,
+    clientID: conf.FACEBOOK_APP_ID,
+    clientSecret: conf.FACEBOOK_APP_SECRET,
     callbackURL: "http://localhost:8080/fbcb"
   },
   function(accessToken, refreshToken, profile, done) {
-	  console.log("Token:" + accessToken);
-      //console.log(util.inspect(profile));
-      return done(null, profile);
+    profile.token = accessToken;
+    return done(null, profile);
   }
 ));
 
@@ -100,25 +99,40 @@ app.get('/logout', function(req, res){
 var db = require('./db');
 
 
+function getFbFriends(token, user_id, done) {
+  var facebook = require('./facebook');
+  facebook.get(token, '/'+user_id+'/friends', 
+    function(data){
+        var obj = JSON.parse(data);
+        var out = "[";
+        for (var i=0; i<obj.data.length; i++) {
+          if (i !== 0) { out += ", "; }
+          out += " \"" + obj.data[i].name.replace("'","") + "\" ";
+        }
+        out += "]";
+        done(out);
+    });
+}
+
 app.get('/user', ensureAuthenticated, function (req, res) {
 
-  var facebook = require('./facebook');
-    facebook.get('AAABeStHC4Q0BAEfuoj8AoIlEfrPhvCZBPLFSYIyoqGqA9ENdX6GMRy0Ih021LYdcfBNZCIXizwmOu0EsA72e0AKCwcxEhVvhBc4ZACImwZDZD', 
-    '/ed.markovich/', function(data){
-      console.log(data);
-  });
+  getFbFriends(req.user.token, req.user.id, function(friend_str) {
+
+    console.log(req.user);
   
-  db.load_topics_for_user(
+    db.load_topics_for_user(
     req.user.username,
     function(err)     {  console.log('error loading convo for user' + err) },
     function(entries) {  res.end(user_template({ 
                                                  user         : req.user,
                                                  topics       : entries,
                                                  alert        : req.query["alert"],
-                                                 current_user : req.user.username    }));
-    }
-  );  
+                                                 current_user : req.user.username,
+                                                 friends      : friend_str }));
+    });
+  });
 });
+ 
 
 
 app.post('/start', ensureAuthenticated, function (req, res) {
