@@ -63,20 +63,65 @@
 
       <!-- Main hero unit for a primary marketing message or call to action -->
       <!-- <div class="hero-unit"> -->
-        
-      <h1><img src="https://graph.facebook.com/{{=it.user.id}}/picture" /> {{=it.user.displayName}}</h1>
-        
-      <legend>Arguments you are in</legend>
 
-        {{ for(var t in it.topics) { }}
-          <h4><a href="/read?topic={{=it.topics[t].topic}}">{{=it.topics[t].topic}} &raquo;</a></h4> 
-          between {{=it.topics[t].from}} and {{=it.topics[t].to}}
-        {{ } }}
+      {{? it.friends }} 
+        <legend>Start an argument with:</legend>
+        
+        
+            <div class="tabbable tabs-top">
+              <ul class="nav nav-tabs">
+                {{ for(var letter in it.friends) { }}          
+                  <li><a href="#{{=it.friends[letter][0].name.substring(0,1)}}" data-toggle="tab">{{=it.friends[letter][0].name.substring(0,1)}}</a></li>
+                {{ } }}
+              </ul>
+              <div class="tab-content">
+               {{ for(var letter in it.friends) { }}
+                <div class="tab-pane active" id="{{=it.friends[letter][0].name.substring(0,1)}}">
+                <ul>
+                  {{ for(var friend in it.friends[letter]) { }}
+                  <li>
+                    <a href="/start?with={{=it.friends[letter][friend].id}}">
+                      <img src="https://graph.facebook.com/{{=it.friends[letter][friend].id}}/picture" /> 
+                      {{=it.friends[letter][friend].name}}
+                    </a>
+                  </li>
+                  {{ } }}
+                </ul>
+                </div>
+              {{ } }}
 
-      <br/><br/>
+              </div>
+            </div> <!-- /tabbable -->        
+        
+        
+        
+        
+
+      {{??}}
+        <h3>
+          {{=it.user.displayName}} <img src="https://graph.facebook.com/{{=it.user.id}}/picture" /> 
+          vs.
+          <img src="https://graph.facebook.com/{{=it.profile.id}}/picture" /> {{=it.profile.name}}
+        </h3>
+  
+        <div class="hero-unit">
+        <form class="form-horizontal" method="post" action="/start">
+          <div class="control-group">
+              <legend>Start an argument</legend>
+          </div>
+          <input type="hidden" name="with" value="{{=it.profile.name}}">
+          <div class="control-group">  
+            <textarea rows="3" name="says"></textarea>
+          </div>
+          <div class="control-group">  
+            <button type="submit" class="btn btn-info">Submit</button>
+          </div>
+        </form>
+        </div>
+        {{?}}
     
-      <legend>New argument</legend>
-      <p><a class="btn btn-primary btn-large" href="/start">Start an argument &raquo;</a></p>
+	
+
 
 	
       <hr>

@@ -4,6 +4,7 @@ var util = require("util");
 var express = require("express");
 app = express();
 
+var facebook = require('./facebook');
 var util = require('util');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -20,6 +21,7 @@ app.use(express.static(__dirname + '/public'));
 
 var convo_template = "";
 var user_template = "";
+var start_template = "";
 
 var fs = require('fs');
 // TODO: you'll probably want to include an 'encoding' to fs.readFile (utf8 works)
@@ -32,6 +34,11 @@ fs.readFile(__dirname + '/public/content/convo.html', function (err, data) {
 fs.readFile(__dirname + '/public/content/user.html', function (err, data) {
 	if (err) { throw err; }
 	user_template = doT.template(data.toString());
+});
+
+fs.readFile(__dirname + '/public/content/start.html', function (err, data) {
+	if (err) { throw err; }
+	start_template = doT.template(data.toString());
 });
 
 var doT = require('dot')
@@ -80,7 +87,7 @@ app.get('/', ensureAuthenticated, function (req, res) {
 
 app.get('/login', //TODOfigure out this failureflash
 	function (req, res) {
-	console.log("login called");
+	console.log("/login called");
 	passport.authenticate('local', 
   { failureRedirect : '/content/login.html',
 		failureFlash : false }),
@@ -98,28 +105,47 @@ app.get('/logout', function(req, res){
 
 var db = require('./db');
 
+function getUserProfile(token, user_id, done) {
+  facebook.get(token, '/'+user_id, 
+    function(data) {
+      var obj = JSON.parse(data);
+      done(obj);
+    });
+}
 
 function getFbFriends(token, user_id, done) {
-  var facebook = require('./facebook');
   facebook.get(token, '/'+user_id+'/friends', 
     function(data){
         var obj = JSON.parse(data);
-        var out = "[";
-        for (var i=0; i<obj.data.length; i++) {
-          if (i !== 0) { out += ", "; }
-          out += " \"" + obj.data[i].name.replace("'","") + "\" ";
+        function compare(a,b) {
+          var a = a.name.toLowerCase();
+          var b = b.name.toLowerCase();
+          if (a < b) return -1;
+          if (a > b) return  1;
+          return 0;
+    }
+
+        obj.data.sort(compare);
+        //done(obj.data);
+        var last = "!";
+        var out2 = { };
+        
+        for (var i = 0; i < obj.data.length; ++i) {
+          var c = obj.data[i].name.substring(0,1);
+          if (c !== last) {
+            out2[c] = [];
+            last =c ;
+          }
+          
+          out2[c].push(obj.data[i]);
         }
-        out += "]";
-        done(out);
+        
+        done(out2);
     });
 }
 
 app.get('/user', ensureAuthenticated, function (req, res) {
 
-  getFbFriends(req.user.token, req.user.id, function(friend_str) {
-
-    console.log(req.user);
-  
     db.load_topics_for_user(
     req.user.username,
     function(err)     {  console.log('error loading convo for user' + err) },
@@ -127,13 +153,25 @@ app.get('/user', ensureAuthenticated, function (req, res) {
                                                  user         : req.user,
                                                  topics       : entries,
                                                  alert        : req.query["alert"],
-                                                 current_user : req.user.username,
-                                                 friends      : friend_str }));
+                                                 current_user : req.user.username
+                                                 }));
     });
-  });
 });
  
-
+app.get('/start', ensureAuthenticated, function (req, res) {
+  var w = req.query["with"];
+  if (!w) {
+    getFbFriends(req.user.token, req.user.id, function(friend_str) {  
+      res.end(start_template({ user:    req.user,
+                               friends: friend_str}));
+    });
+  } else {
+    getUserProfile(req.user.token, w, function(profile) {  
+      res.end(start_template({ user:    req.user,
+                               profile: profile}));
+    });
+  }
+});
 
 app.post('/start', ensureAuthenticated, function (req, res) {
   db.create_topic(
@@ -156,7 +194,7 @@ app.post('/start', ensureAuthenticated, function (req, res) {
 
 
 app.get('/read', ensureAuthenticated, function (req, res) {
-  console.log("read called");
+  console.log("/read called");
   db.load_arguments_for_topic(req.query["topic"], 
     function (err) { 
       console.log("Failed to load convos:" + err);  
