@@ -109,6 +109,7 @@ function getUserProfile(token, user_id, done) {
   facebook.get(token, '/'+user_id, 
     function(data) {
       var obj = JSON.parse(data);
+      console.log(obj);
       done(obj);
     });
 }
@@ -182,12 +183,22 @@ app.post('/start', ensureAuthenticated, function (req, res) {
                 res.redirect('/user?alert='+err);
               },
               function() {
+                console.log("with id:" + req.with);
                 db.add_argument(req.body.says, req.user.username, req.body.says,
                 function (fail_text) {
                   res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
                 },
                 function () {		        
-                  res.redirect('/read?topic='+req.body.says);
+                  console.log(req.body.with);
+                  //res.redirect('/read?topic='+req.body.says);
+                  res.redirect('https://www.facebook.com/dialog/apprequests?%20app_id='
+                  + conf.FACEBOOK_APP_ID
+                  +'&%20message=I am using Mediator to discuss an issue with you: ' 
+                  + req.body.says
+                  +'.&%20redirect_uri=http://localhost:8080/read?topic='
+                  +req.body.says 
+                  //+ '&to=' + req.body.with);
+                  + '&to=' + 'ed.markovich');
                 });
               });
 });
@@ -212,7 +223,7 @@ app.get('/read', ensureAuthenticated, function (req, res) {
 });
 
 app.get('/remove', ensureAuthenticated, function (req, res) {
-  if (req.user.username != 'ed') {
+  if (req.user.username != 'ed.markovich') {
     res.end("only ed can do this");
     return;
   }
