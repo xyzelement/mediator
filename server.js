@@ -81,13 +81,11 @@ function ensureAuthenticated(req, res, next) {
 }
 
 app.get('/', ensureAuthenticated, function (req, res) {
-	console.log("/ called");
 	res.redirect('/user');
 });
 
 app.get('/login', //TODOfigure out this failureflash
 	function (req, res) {
-	console.log("/login called");
 	passport.authenticate('local', 
   { failureRedirect : '/content/login.html',
 		failureFlash : false }),
@@ -109,7 +107,6 @@ function getUserProfile(token, user_id, done) {
   facebook.get(token, '/'+user_id, 
     function(data) {
       var obj = JSON.parse(data);
-      console.log(obj);
       done(obj);
     });
 }
@@ -145,12 +142,24 @@ function getFbFriends(token, user_id, done) {
     });
 }
 
-app.get('/user', ensureAuthenticated, function (req, res) {
+function get_fb_invite_url(user_to_invite, topic) {
+  return 'https://www.facebook.com/dialog/apprequests?%20app_id='
+          + conf.FACEBOOK_APP_ID
+          +'&%20message=I am using Mediator to discuss an issue with you: ' 
+          + topic 
+          +'.&%20redirect_uri=http://localhost:8080/read?topic='
+          + topic 
+          + '&to=' + user_to_invite
+}
 
+
+app.get('/user', ensureAuthenticated, function (req, res) {
+    //EMTOOD: use user_id not name
+    console.log("* /user " + req.user.username);
     db.load_topics_for_user(
-    req.user.username,
-    function(err)     {  console.log('error loading convo for user' + err) },
-    function(entries) {  res.end(user_template({ 
+      req.user.username,
+      function(err)     {  console.log('error loading convo for user' + err) },
+      function(entries) {  res.end(user_template({ 
                                                  user         : req.user,
                                                  topics       : entries,
                                                  alert        : req.query["alert"],
@@ -161,6 +170,7 @@ app.get('/user', ensureAuthenticated, function (req, res) {
  
 app.get('/start', ensureAuthenticated, function (req, res) {
   var w = req.query["with"];
+  console.log("* /start(g) " + w);
   if (!w) {
     getFbFriends(req.user.token, req.user.id, function(friend_str) {  
       res.end(start_template({ user:    req.user,
@@ -174,7 +184,10 @@ app.get('/start', ensureAuthenticated, function (req, res) {
   }
 });
 
+
 app.post('/start', ensureAuthenticated, function (req, res) {
+  console.log("* /start(p) " + req.user.username + " " + req.body.with + " " + req.body.says);
+  //EMTOOD: use my ID rather than user name
   db.create_topic(
               req.user.username, // from
               req.body.with,     // to
@@ -183,29 +196,22 @@ app.post('/start', ensureAuthenticated, function (req, res) {
                 res.redirect('/user?alert='+err);
               },
               function() {
-                console.log("with id:" + req.with);
+                //EMTODO: Perhaps first 'salvo' should be different than topic.
+                //EMTODO: the first argument doesn't seem to actually save?
                 db.add_argument(req.body.says, req.user.username, req.body.says,
                 function (fail_text) {
                   res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
                 },
                 function () {		        
-                  console.log(req.body.with);
-                  //res.redirect('/read?topic='+req.body.says);
-                  res.redirect('https://www.facebook.com/dialog/apprequests?%20app_id='
-                  + conf.FACEBOOK_APP_ID
-                  +'&%20message=I am using Mediator to discuss an issue with you: ' 
-                  + req.body.says
-                  +'.&%20redirect_uri=http://localhost:8080/read?topic='
-                  +req.body.says 
-                  //+ '&to=' + req.body.with);
-                  + '&to=' + 'ed.markovich');
+                  res.redirect(  get_fb_invite_url('ed.markovich', req.body.says) );
                 });
               });
 });
 
 
 app.get('/read', ensureAuthenticated, function (req, res) {
-  console.log("/read called");
+  //EMTODO: support the idea of who the conversation is to/from
+  console.log("* /read " + req.query["topic"]);
   db.load_arguments_for_topic(req.query["topic"], 
     function (err) { 
       console.log("Failed to load convos:" + err);  
@@ -223,16 +229,10 @@ app.get('/read', ensureAuthenticated, function (req, res) {
 });
 
 
-app.get('/remove', ensureAuthenticated, function (req, res) {
-  if (req.user.username != 'ed.markovich') {
-    res.end("only ed can do this");
-    return;
-  }
-  db.delete_everything( function() {res.redirect('/');}) ;
-
-});
-
-app.post('/add', ensureAuthenticated, function (req, res) {
+app.post('/add_comment', ensureAuthenticated, function (req, res) {
+  //EMTODO: use id not username
+  //EMTODO: support idea of who this is said TO
+  console.log("* /add_comment " + req.body.topic + " " + req.user.username + " " + req.body.says);
   db.add_argument(req.body.topic, req.user.username, req.body.says,
       function (fail_text) {
         res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
@@ -242,5 +242,13 @@ app.post('/add', ensureAuthenticated, function (req, res) {
       });
 });
 
+
+app.get('/remove', ensureAuthenticated, function (req, res) {
+  if (req.user.username != 'ed.markovich') {
+    res.end("only ed can do this");
+    return;
+  }
+  db.delete_everything( function() {res.redirect('/');}) ;
+});
 
 require('http').createServer(app).listen(8080);
