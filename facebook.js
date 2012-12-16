@@ -1,4 +1,6 @@
 var https = require('https');
+var conf = require("./config.js");
+ 
  
 exports.get = function(accessToken, apiPath, callback) {
     // creating options object for the https request
@@ -46,3 +48,56 @@ exports.get = function(accessToken, apiPath, callback) {
  
     request.end();
 }
+
+
+
+
+exports.getUserProfile = function(token, user_id, done) {
+  exports.get(token, '/'+user_id, 
+    function(data) {
+      var obj = JSON.parse(data);
+      done(obj);
+    });
+}
+
+exports.getFbFriends = function(token, user_id, done) {
+  exports.get(token, '/'+user_id+'/friends', 
+    function(data){
+        var obj = JSON.parse(data);
+        function compare(a,b) {
+          var a = a.name.toLowerCase();
+          var b = b.name.toLowerCase();
+          if (a < b) return -1;
+          if (a > b) return  1;
+          return 0;
+    }
+
+        obj.data.sort(compare);
+        //done(obj.data);
+        var last = "!";
+        var out2 = { };
+        
+        for (var i = 0; i < obj.data.length; ++i) {
+          var c = obj.data[i].name.substring(0,1);
+          if (c !== last) {
+            out2[c] = [];
+            last =c ;
+          }
+          
+          out2[c].push(obj.data[i]);
+        }
+        
+        done(out2);
+    });
+}
+
+exports.get_fb_invite_url = function (user_to_invite, topic) {
+  return 'https://www.facebook.com/dialog/apprequests?%20app_id='
+          + conf.FACEBOOK_APP_ID
+          +'&%20message=I am using Mediator to discuss an issue with you: ' 
+          + topic 
+          +'.&%20redirect_uri=http://localhost:8080/read?topic='
+          + topic 
+          + '&to=' + user_to_invite
+}
+

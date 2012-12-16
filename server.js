@@ -1,10 +1,13 @@
 var users = require("./user_stuff");
 var conf = require("./config.js");
+var facebook = require("./facebook");
+
+
 var util = require("util");
 var express = require("express");
+
 app = express();
 
-var facebook = require('./facebook');
 var util = require('util');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -103,56 +106,6 @@ app.get('/logout', function(req, res){
 
 var db = require('./db');
 
-function getUserProfile(token, user_id, done) {
-  facebook.get(token, '/'+user_id, 
-    function(data) {
-      var obj = JSON.parse(data);
-      done(obj);
-    });
-}
-
-function getFbFriends(token, user_id, done) {
-  facebook.get(token, '/'+user_id+'/friends', 
-    function(data){
-        var obj = JSON.parse(data);
-        function compare(a,b) {
-          var a = a.name.toLowerCase();
-          var b = b.name.toLowerCase();
-          if (a < b) return -1;
-          if (a > b) return  1;
-          return 0;
-    }
-
-        obj.data.sort(compare);
-        //done(obj.data);
-        var last = "!";
-        var out2 = { };
-        
-        for (var i = 0; i < obj.data.length; ++i) {
-          var c = obj.data[i].name.substring(0,1);
-          if (c !== last) {
-            out2[c] = [];
-            last =c ;
-          }
-          
-          out2[c].push(obj.data[i]);
-        }
-        
-        done(out2);
-    });
-}
-
-function get_fb_invite_url(user_to_invite, topic) {
-  return 'https://www.facebook.com/dialog/apprequests?%20app_id='
-          + conf.FACEBOOK_APP_ID
-          +'&%20message=I am using Mediator to discuss an issue with you: ' 
-          + topic 
-          +'.&%20redirect_uri=http://localhost:8080/read?topic='
-          + topic 
-          + '&to=' + user_to_invite
-}
-
-
 app.get('/user', ensureAuthenticated, function (req, res) {
     //EMTOOD: use user_id not name
     console.log("* /user " + req.user.username);
@@ -172,12 +125,12 @@ app.get('/start', ensureAuthenticated, function (req, res) {
   var w = req.query["with"];
   console.log("* /start(g) " + w);
   if (!w) {
-    getFbFriends(req.user.token, req.user.id, function(friend_str) {  
+    facebook.getFbFriends(req.user.token, req.user.id, function(friend_str) {  
       res.end(start_template({ user:    req.user,
                                friends: friend_str}));
     });
   } else {
-    getUserProfile(req.user.token, w, function(profile) {  
+    facebook.getUserProfile(req.user.token, w, function(profile) {  
       res.end(start_template({ user:    req.user,
                                profile: profile}));
     });
@@ -203,7 +156,7 @@ app.post('/start', ensureAuthenticated, function (req, res) {
                   res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
                 },
                 function () {		        
-                  res.redirect(  get_fb_invite_url('ed.markovich', req.body.says) );
+                  res.redirect(  facebook.get_fb_invite_url('ed.markovich', req.body.says) );
                 });
               });
 });
