@@ -222,6 +222,7 @@ app.get('/read', ensureAuthenticated, function (req, res) {
 	});
 });
 
+
 app.get('/remove', ensureAuthenticated, function (req, res) {
   if (req.user.username != 'ed.markovich') {
     res.end("only ed can do this");
