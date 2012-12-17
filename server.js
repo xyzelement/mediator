@@ -1,3 +1,5 @@
+//TODO: completely rethink the user_oject model for passing that stuff around
+
 
 var conf = require("./config.js");    
 var facebook = require("./facebook");
@@ -93,6 +95,7 @@ app.get('/login', //TODOfigure out this failureflash
   { failureRedirect : '/content/login.html',
 		failureFlash : false }),
 	function (req, res) {
+    user_cache.token = req.user.token;
     res.redirect('/');
   }
 	}
@@ -135,8 +138,9 @@ app.get('/start', ensureAuthenticated, function (req, res) {
   console.log("* /start(g) " + w);
   if (!w) {
     facebook.getFbFriends(req.user.token, req.user.id, function(friend_str) {  
-      res.end(start_template({ user:    user_cache.getUserObject(req.user.id),
-                               friends: friend_str}));
+      user_cache.getUserObjectAsynch(req.user_id, function (userObj) {
+        res.end(start_template({ user:    userObj,
+                               friends: friend_str})) });
     });
   } else {
     facebook.getUserProfile(req.user.token, w, function(target) {  
@@ -169,8 +173,10 @@ app.post('/start', ensureAuthenticated, function (req, res) {
 });
 
 
+
 app.get('/read', ensureAuthenticated, function (req, res) {
   //EMTODO: support the idea of who the conversation is to/from
+  
   console.log("* /read " + req.query["topic"]);
   db.load_arguments_for_topic(req.query["topic"], 
     function (err) { 
@@ -178,21 +184,29 @@ app.get('/read', ensureAuthenticated, function (req, res) {
       res.redirect('/user');
     }, 
     function (entries) {
-      arguments = [];
+      arguments1 = [];
+      user_ids  = [req.user.id]; //make sure to always have our own user object
       for (i=0; i<entries.length; ++i) {
-        arguments.push({
-          from: user_cache.getUserObject(entries[i].user_id),
+        user_ids.push(entries[i].user_id);
+        arguments1.push({
+          from: entries[i].user_id,
           text: entries[i].says
         });
       }
     
-			var obj = {
-        topic:        req.query["topic"],
-				argument :    arguments,
-				alert :       req.query["alert"],
-        user:         user_cache.getUserObject(req.user.id)
-			};
-			res.end(convo_template(obj));
+      //EMTODO: a better place to set the token?
+      user_cache.token = req.user.token;
+      user_cache.create_user_data(user_ids, {} ,function(users) { 
+        var obj = {
+          topic:        req.query["topic"],
+          argument :    arguments1,
+          alert :       req.query["alert"],
+          user_id:      req.user.id,
+          users:        users
+        };
+        
+        res.end(convo_template(obj)); 
+      });
 	});
 });
 

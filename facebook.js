@@ -1,7 +1,6 @@
 var https = require('https');
 var conf = require("./config.js");
  
- 
 exports.get = function(accessToken, apiPath, callback) {
     // creating options object for the https request
     var options = {
@@ -44,19 +43,14 @@ exports.get = function(accessToken, apiPath, callback) {
     request.on('error', function(e){
         console.log('error from facebook.get(): '
                      + e.message);
-    });
- 
+    }); 
     request.end();
 }
-
-
-
 
 exports.getUserProfile = function(token, user_id, done) {
   exports.get(token, '/'+user_id, 
     function(data) {
       var obj = JSON.parse(data);
-      //console.log(obj);
       done(obj);
     });
 }
@@ -74,7 +68,6 @@ exports.getFbFriends = function(token, user_id, done) {
     }
 
         obj.data.sort(compare);
-        //done(obj.data);
         var last = "!";
         var out2 = { };
         
