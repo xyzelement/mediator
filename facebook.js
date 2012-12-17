@@ -88,6 +88,7 @@ exports.getFbFriends = function(token, user_id, done) {
           out2[c].push(obj.data[i]);
         }
         
+        //console.log(out2);
         done(out2);
     });
 }

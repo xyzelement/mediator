@@ -81,7 +81,7 @@
                   {{ for(var friend in it.friends[letter]) { }}
                   <li>
                     <a href="/start?with={{=it.friends[letter][friend].id}}">
-                      <img src="https://graph.facebook.com/{{=it.friends[letter][friend].id}}/picture" /> 
+                      <!-- <img src="https://graph.facebook.com/{{=it.friends[letter][friend].id}}/picture" /> -->
                       {{=it.friends[letter][friend].name}}
                     </a>
                   </li>
@@ -99,9 +99,9 @@
 
       {{??}}
         <h3>
-          {{=it.user.id}} <img src="https://graph.facebook.com/{{=it.user.id}}/picture" /> 
+          {{=it.user_id}} <img src="https://graph.facebook.com/{{=it.user_id}}/picture" /> 
           vs.
-          <img src="https://graph.facebook.com/{{=it.profile.id}}/picture" /> {{=it.profile.id}}
+          <img src="https://graph.facebook.com/{{=it.target_id}}/picture" /> {{=it.target_id}}
         </h3>
   
         <div class="hero-unit">
@@ -109,7 +109,7 @@
           <div class="control-group">
               <legend>Start an argument</legend>
           </div>
-          <input type="hidden" name="with" value="{{=it.profile.id}}">
+          <input type="hidden" name="with" value="{{=it.target_id}}">
           <div class="control-group">  
             <textarea rows="3" name="says"></textarea>
           </div>

@@ -125,13 +125,13 @@ app.get('/start', ensureAuthenticated, function (req, res) {
   console.log("* /start(g) " + w);
   if (!w) {
     facebook.getFbFriends(req.user.token, req.user.id, function(friend_str) {  
-      res.end(start_template({ user:    req.user,
+      res.end(start_template({ user_id:    req.user.id,
                                friends: friend_str}));
     });
   } else {
-    facebook.getUserProfile(req.user.token, w, function(profile) {  
-      res.end(start_template({ user:    req.user,
-                               profile: profile}));
+    facebook.getUserProfile(req.user.token, w, function(target) {  
+      res.end(start_template({ user_id:    req.user.id,
+                               target_id:  target.id}));
     });
   }
 });
