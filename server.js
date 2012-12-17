@@ -1,7 +1,7 @@
 
 var conf = require("./config.js");    
 var facebook = require("./facebook");
-
+var user_cache = require("./user_cache");
 
 var util = require("util");
 var express = require("express");
@@ -107,16 +107,26 @@ app.get('/logout', function(req, res){
 var db = require('./db');
 
 app.get('/user', ensureAuthenticated, function (req, res) {
-    //EMTOOD: use user_id not name
+    
     console.log("* /user " + req.user.id);
     db.load_topics_for_user(
       req.user.id,
       function(err)     {  console.log('error loading convo for user' + err) },
-      function(entries) {  res.end(user_template({ 
-                                                 user_id      : req.user.id,
-                                                 topics       : entries,
-                                                 alert        : req.query["alert"]
-                                                 }));
+      function(entries) {  
+          topics = [];
+          for (i=0; i<entries.length; ++i) {
+            topics.push({
+              topic: entries[i].topic,
+              from:  user_cache.getUserObject( entries[i].from ),
+              to:    user_cache.getUserObject( entries[i].to ),
+            });
+          }
+      
+          res.end(user_template({ 
+            user         : user_cache.getUserObject(req.user.id),
+            topics       : topics,
+            alert        : req.query["alert"]
+          }));
     });
 });
  
@@ -125,13 +135,13 @@ app.get('/start', ensureAuthenticated, function (req, res) {
   console.log("* /start(g) " + w);
   if (!w) {
     facebook.getFbFriends(req.user.token, req.user.id, function(friend_str) {  
-      res.end(start_template({ user_id:    req.user.id,
+      res.end(start_template({ user:    user_cache.getUserObject(req.user.id),
                                friends: friend_str}));
     });
   } else {
     facebook.getUserProfile(req.user.token, w, function(target) {  
-      res.end(start_template({ user_id:    req.user.id,
-                               target_id:  target.id}));
+      res.end(start_template({ user:        user_cache.getUserObject(req.user.id),
+                               target_user: user_cache.getUserObject(target.id)}));
     });
   }
 });
@@ -139,7 +149,6 @@ app.get('/start', ensureAuthenticated, function (req, res) {
 
 app.post('/start', ensureAuthenticated, function (req, res) {
   console.log("* /start(p) " + req.user.id + " " + req.body.with + " " + req.body.says);
-  //EMTOOD: use my ID rather than user name
   db.create_topic(
               req.user.id, // from
               req.body.with,     // to
@@ -149,13 +158,12 @@ app.post('/start', ensureAuthenticated, function (req, res) {
               },
               function() {
                 //EMTODO: Perhaps first 'salvo' should be different than topic.
-                //EMTODO: the first argument doesn't seem to actually save?
                 db.add_argument(req.body.says, req.user.id, req.body.says,
                 function (fail_text) {
                   res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
                 },
                 function () {		        
-                  res.redirect(  facebook.get_fb_invite_url('ed.markovich', req.body.says) );
+                  res.redirect(  facebook.get_fb_invite_url(req.body.with/*'ed.markovich'*/, req.body.says) );
                 });
               });
 });
@@ -170,11 +178,19 @@ app.get('/read', ensureAuthenticated, function (req, res) {
       res.redirect('/user');
     }, 
     function (entries) {
+      arguments = [];
+      for (i=0; i<entries.length; ++i) {
+        arguments.push({
+          from: user_cache.getUserObject(entries[i].user_id),
+          text: entries[i].says
+        });
+      }
+    
 			var obj = {
         topic:        req.query["topic"],
-				argument :    entries,
+				argument :    arguments,
 				alert :       req.query["alert"],
-        user_id:      req.user.id
+        user:         user_cache.getUserObject(req.user.id)
 			};
 			res.end(convo_template(obj));
 	});
@@ -182,7 +198,6 @@ app.get('/read', ensureAuthenticated, function (req, res) {
 
 
 app.post('/add_comment', ensureAuthenticated, function (req, res) {
-  //EMTODO: use id not id
   //EMTODO: support idea of who this is said TO
   console.log("* /add_comment " + req.body.topic + " " + req.user.id + " " + req.body.says);
   db.add_argument(req.body.topic, req.user.id, req.body.says,
