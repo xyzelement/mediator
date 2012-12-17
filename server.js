@@ -113,10 +113,9 @@ app.get('/user', ensureAuthenticated, function (req, res) {
       req.user.id,
       function(err)     {  console.log('error loading convo for user' + err) },
       function(entries) {  res.end(user_template({ 
-                                                 user         : req.user,
+                                                 user_id      : req.user.id,
                                                  topics       : entries,
-                                                 alert        : req.query["alert"],
-                                                 current_user : req.user.id
+                                                 alert        : req.query["alert"]
                                                  }));
     });
 });
