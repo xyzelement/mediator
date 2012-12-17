@@ -1,5 +1,3 @@
-var users = require("./user_stuff");
-
 
 var mongo;
 app.configure('development', function(){
@@ -38,12 +36,12 @@ exports.load_topics_for_user = function (user, fail, cb) {
 	});
 }
 
-exports.add_argument = function(topic, username, says, fail, cb) {
+exports.add_argument = function(topic, user_id, says, fail, cb) {
 	if (says.length === 0) {
     fail("You probably want to say something here");		
 		return;
 	}
-  exports.db.arguments.save({ topic: topic, username: username, says: says}, function(err, saved) {
+  exports.db.arguments.save({ topic: topic, user_id: user_id, says: says}, function(err, saved) {
     if (err || !saved) { 
       fail("User not saved"); 
       return;

@@ -1,4 +1,4 @@
-var users = require("./user_stuff");
+
 var conf = require("./config.js");    
 var facebook = require("./facebook");
 
@@ -174,7 +174,7 @@ app.get('/read', ensureAuthenticated, function (req, res) {
         topic:        req.query["topic"],
 				argument :    entries,
 				alert :       req.query["alert"],
-        current_user: req.user.id
+        user_id:      req.user.id
 			};
 			res.end(convo_template(obj));
 	});
