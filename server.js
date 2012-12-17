@@ -1,5 +1,5 @@
 var users = require("./user_stuff");
-var conf = require("./config.js");
+var conf = require("./config.js");    
 var facebook = require("./facebook");
 
 
@@ -108,15 +108,15 @@ var db = require('./db');
 
 app.get('/user', ensureAuthenticated, function (req, res) {
     //EMTOOD: use user_id not name
-    console.log("* /user " + req.user.username);
+    console.log("* /user " + req.user.id);
     db.load_topics_for_user(
-      req.user.username,
+      req.user.id,
       function(err)     {  console.log('error loading convo for user' + err) },
       function(entries) {  res.end(user_template({ 
                                                  user         : req.user,
                                                  topics       : entries,
                                                  alert        : req.query["alert"],
-                                                 current_user : req.user.username
+                                                 current_user : req.user.id
                                                  }));
     });
 });
@@ -139,10 +139,10 @@ app.get('/start', ensureAuthenticated, function (req, res) {
 
 
 app.post('/start', ensureAuthenticated, function (req, res) {
-  console.log("* /start(p) " + req.user.username + " " + req.body.with + " " + req.body.says);
+  console.log("* /start(p) " + req.user.id + " " + req.body.with + " " + req.body.says);
   //EMTOOD: use my ID rather than user name
   db.create_topic(
-              req.user.username, // from
+              req.user.id, // from
               req.body.with,     // to
               req.body.says,     // topic
               function(err) {
@@ -151,7 +151,7 @@ app.post('/start', ensureAuthenticated, function (req, res) {
               function() {
                 //EMTODO: Perhaps first 'salvo' should be different than topic.
                 //EMTODO: the first argument doesn't seem to actually save?
-                db.add_argument(req.body.says, req.user.username, req.body.says,
+                db.add_argument(req.body.says, req.user.id, req.body.says,
                 function (fail_text) {
                   res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
                 },
@@ -175,7 +175,7 @@ app.get('/read', ensureAuthenticated, function (req, res) {
         topic:        req.query["topic"],
 				argument :    entries,
 				alert :       req.query["alert"],
-        current_user: req.user.username
+        current_user: req.user.id
 			};
 			res.end(convo_template(obj));
 	});
@@ -183,10 +183,10 @@ app.get('/read', ensureAuthenticated, function (req, res) {
 
 
 app.post('/add_comment', ensureAuthenticated, function (req, res) {
-  //EMTODO: use id not username
+  //EMTODO: use id not id
   //EMTODO: support idea of who this is said TO
-  console.log("* /add_comment " + req.body.topic + " " + req.user.username + " " + req.body.says);
-  db.add_argument(req.body.topic, req.user.username, req.body.says,
+  console.log("* /add_comment " + req.body.topic + " " + req.user.id + " " + req.body.says);
+  db.add_argument(req.body.topic, req.user.id, req.body.says,
       function (fail_text) {
         res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);
       },

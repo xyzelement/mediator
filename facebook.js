@@ -56,6 +56,7 @@ exports.getUserProfile = function(token, user_id, done) {
   exports.get(token, '/'+user_id, 
     function(data) {
       var obj = JSON.parse(data);
+      //console.log(obj);
       done(obj);
     });
 }
