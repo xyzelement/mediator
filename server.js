@@ -52,9 +52,6 @@ passport.serializeUser(function(user, done)  { done(null, user); });
 passport.deserializeUser(function(obj, done) { done(null, obj);  });
 
 
-
-
-
 passport.use(new FacebookStrategy({
     clientID: conf.FACEBOOK_APP_ID,
     clientSecret: conf.FACEBOOK_APP_SECRET,
@@ -72,22 +69,26 @@ app.get('/fb',
   function(req, res){
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
-  });
+});
 
+  
 app.get('/fbcb', 
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
     res.redirect('/');
-  });
+});
+
 
 function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) { return next(); }
 	res.redirect('/content/login.html')
 }
 
+
 app.get('/', ensureAuthenticated, function (req, res) {
 	res.redirect('/user');
 });
+
 
 app.get('/login', //TODOfigure out this failureflash
 	function (req, res) {
@@ -101,6 +102,7 @@ app.get('/login', //TODOfigure out this failureflash
 	}
 );
 
+
 app.get('/logout', function(req, res){
   req.logout();
   res.redirect('/');
@@ -110,45 +112,54 @@ app.get('/logout', function(req, res){
 var db = require('./db');
 
 app.get('/user', ensureAuthenticated, function (req, res) {
-    
-    console.log("* /user " + req.user.id);
-    db.load_topics_for_user(
+  console.log("* /user " + req.user.id);
+  
+  db.load_topics_for_user(
       req.user.id,
       function(err)     {  console.log('error loading convo for user' + err) },
       function(entries) {  
-          topics = [];
+          user_ids = [req.user.id];
           for (i=0; i<entries.length; ++i) {
-            topics.push({
-              topic: entries[i].topic,
-              from:  user_cache.getUserObject( entries[i].from ),
-              to:    user_cache.getUserObject( entries[i].to ),
-            });
+            user_ids.push( entries[i].from );
+            user_ids.push( entries[i].to   );
           }
       
-          res.end(user_template({ 
-            user         : user_cache.getUserObject(req.user.id),
-            topics       : topics,
-            alert        : req.query["alert"]
-          }));
-    });
+          user_cache.create_user_data(req.user.token, user_ids, {} ,function(users) { 
+          
+            res.end(user_template({ 
+              user_id      : req.user.id,
+              topics       : entries,
+              alert        : req.query["alert"],
+              users        : users
+            }));
+          });
+      })
 });
+
  
 app.get('/start', ensureAuthenticated, function (req, res) {
   var w = req.query["with"];
   console.log("* /start(g) " + w);
   if (!w) {
-    facebook.getFbFriends(req.user.token, req.user.id, function(friend_str) {  
-      user_cache.getUserObjectAsynch(req.user_id, function (userObj) {
-        res.end(start_template({ user:    userObj,
-                               friends: friend_str})) });
+    facebook.getFbFriends(req.user.token, req.user.id, function(friend_str) { 
+
+      user_cache.create_user_data(req.user.token, [req.user.id], {}, function(users) {
+      
+        res.end(start_template({ user_id:    req.user.id,
+                                 users:      users,
+                                 friends:    friend_str})) 
+      });
     });
   } else {
     facebook.getUserProfile(req.user.token, w, function(target) {  
-      res.end(start_template({ user:        user_cache.getUserObject(req.user.id),
-                               target_user: user_cache.getUserObject(target.id)}));
+      user_cache.create_user_data(req.user.token, [req.user.id, target.id], {}, function(users) {
+        res.end(start_template({ 
+                                  users:       users,
+                                  user_id:     req.user.id,
+                                  target_id:   target.id }));
     });
-  }
-});
+  });
+}});
 
 
 app.post('/start', ensureAuthenticated, function (req, res) {
@@ -173,33 +184,24 @@ app.post('/start', ensureAuthenticated, function (req, res) {
 });
 
 
-
 app.get('/read', ensureAuthenticated, function (req, res) {
-  //EMTODO: support the idea of who the conversation is to/from
-  
   console.log("* /read " + req.query["topic"]);
+  
   db.load_arguments_for_topic(req.query["topic"], 
     function (err) { 
       console.log("Failed to load convos:" + err);  
-      res.redirect('/user');
-    }, 
+      res.redirect('/user'); }, 
     function (entries) {
-      arguments1 = [];
       user_ids  = [req.user.id]; //make sure to always have our own user object
       for (i=0; i<entries.length; ++i) {
         user_ids.push(entries[i].user_id);
-        arguments1.push({
-          from: entries[i].user_id,
-          text: entries[i].says
-        });
       }
     
-      //EMTODO: a better place to set the token?
-      user_cache.token = req.user.token;
-      user_cache.create_user_data(user_ids, {} ,function(users) { 
+      user_cache.create_user_data(req.user.token, user_ids, {} ,function(users) { 
+      
         var obj = {
           topic:        req.query["topic"],
-          argument :    arguments1,
+          argument :    entries,
           alert :       req.query["alert"],
           user_id:      req.user.id,
           users:        users
@@ -231,5 +233,6 @@ app.get('/remove', ensureAuthenticated, function (req, res) {
   }
   db.delete_everything( function() {res.redirect('/');}) ;
 });
+
 
 require('http').createServer(app).listen(8080);

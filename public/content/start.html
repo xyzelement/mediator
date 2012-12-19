@@ -99,9 +99,9 @@
 
       {{??}}
         <h3>
-          <img src="{{=it.user.pictureUrl}}" /> {{=it.user.displayName}}
+          <img src="{{=it.users[it.user_id].pictureUrl}}" /> {{=it.users[it.user_id].displayName}}
           vs.
-          <img src="{{=it.target_user.pictureUrl}}" /> {{=it.target_user.displayName}}
+          <img src="{{=it.users[it.target_id].pictureUrl}}" /> {{=it.users[it.target_id].displayName}}
         </h3>
   
         <div class="hero-unit">
@@ -109,7 +109,7 @@
           <div class="control-group">
               <legend>Start an argument</legend>
           </div>
-          <input type="hidden" name="with" value="{{=it.target_user.userId}}">
+          <input type="hidden" name="with" value="{{=it.target_id}}">
           <div class="control-group">  
             <textarea rows="3" name="says"></textarea>
           </div>
