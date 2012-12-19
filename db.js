@@ -25,8 +25,20 @@ var db = require('mongojs').connect(mongourl, ['topics', 'arguments']);
 
 exports.db = db;
 
+exports.get_debug = function ( cb ) {
+  exports.db.topics.find( {}, function (err, out) { 
+    exports.db.arguments.find( {}, function (err1, out1) { 
+      console.log("Topics"+out);
+      console.log("Arguments"+  out1);
+      cb({ topics: out, arguments: out1});
+    } );
+  } );
+}
+
 
 exports.load_topics_for_user = function (user, fail, cb) {
+  exports.get_debug_data( function(e) { console.log(e); } );
+
 	exports.db.topics.find({ $or : [ {from: user}, { to: user}   ]}, function (err, entries) {
 		if (err || !entries) {
 			fail("Oops. No data found");

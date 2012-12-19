@@ -225,6 +225,9 @@ app.post('/add_comment', ensureAuthenticated, function (req, res) {
       });
 });
 
+app.get('/debug', function(req,res) { 
+  db.get_debug( function(out) { res.end( util.inspect(out) ); }); 
+});
 
 app.get('/remove', ensureAuthenticated, function (req, res) {
   if (req.user.username != 'ed.markovich') {
