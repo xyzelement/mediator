@@ -37,7 +37,7 @@ exports.get_debug = function ( cb ) {
 
 
 exports.load_topics_for_user = function (user, fail, cb) {
-  exports.get_debug_data( function(e) { console.log(e); } );
+  exports.get_debug( function(e) { console.log(e); } );
 
 	exports.db.topics.find({ $or : [ {from: user}, { to: user}   ]}, function (err, entries) {
 		if (err || !entries) {
