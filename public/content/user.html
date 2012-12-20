@@ -69,8 +69,9 @@
       <legend>Arguments you are in</legend>
 
         {{ for(var t in it.topics) { }}
-          <h4><a href="/read?topic={{=it.topics[t].topic}}">{{=it.topics[t].topic}} &raquo;</a></h4> 
+          <h4><a href="/read?topic={{=it.topics[t]._id}}">{{=it.topics[t].topic}} &raquo;</a></h4> 
           between {{=it.users[it.topics[t].from].displayName}} and {{=it.users[it.topics[t].to].displayName}}
+          <i>{{=it.topics[t]._id}}</i>
         {{ } }}
 
       <br/><br/>

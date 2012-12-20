@@ -8,6 +8,9 @@ app.configure('production', function(){
     mongo = env['mongodb-1.8'][0]['credentials'];
 });
 
+var mongojs = require('mongojs');
+var ObjectId = mongojs.ObjectId;
+
 var generate_mongo_url = function(obj){
     obj.hostname = (obj.hostname || 'localhost');
     obj.port = (obj.port || 27017);
@@ -37,7 +40,6 @@ exports.get_debug = function ( cb ) {
 
 
 exports.load_topics_for_user = function (user, fail, cb) {
-  exports.get_debug( function(e) { console.log(e); } );
 
 	exports.db.topics.find({ $or : [ {from: user}, { to: user}   ]}, function (err, entries) {
 		if (err || !entries) {
@@ -49,26 +51,32 @@ exports.load_topics_for_user = function (user, fail, cb) {
 }
 
 exports.add_argument = function(topic, user_id, says, fail, cb) {
+
+  if (typeof(topic) === "string") {
+    topic = ObjectId(topic);
+  }
+
+
 	if (says.length === 0) {
     fail("You probably want to say something here");		
 		return;
 	}
   exports.db.arguments.save({ topic: topic, user_id: user_id, says: says}, function(err, saved) {
-    if (err || !saved) { 
-      fail("User not saved"); 
-      return;
-    }    
-    cb();
+    if (err || !saved) {  fail("User not saved");  return; }    
+    cb(saved);
   });
 }
 
 exports.load_arguments_for_topic = function(topic, fail, cb) {
+
+
   if(!topic || topic.length==0) {
     fail("You need a topic!");
     return;
   }
-  
-  exports.db.arguments.find({topic: topic}, 
+
+  exports.db.arguments.find({topic: ObjectId(topic)}, 
+
     function(err, entities) {
         if (err || !entities) fail(err);
         else if (!entities)   fail("No entities loaded");
@@ -86,8 +94,9 @@ exports.create_topic = function(from, to, topic, fail, cb) {
         to:    to
   }
   
-  exports.db.topics.save(t);
-  cb();
+  exports.db.topics.save(t, 
+    function(err, saved){cb(saved);});
+  
 }
 
 exports.delete_everything = function(cb) {

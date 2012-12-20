@@ -82,11 +82,11 @@ app.post('/start', ensureAuthenticated, function (req, res) {
               req.user.id,       // from
               req.body.with,     // to
               req.body.says,     // topic
-              function(err) {  res.redirect('/user?alert='+err);   },
-              function()    {
-                db.add_argument(req.body.says, req.user.id, req.body.says,
-                  function (fail_text) {  res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);  },
-                  function ()          {	res.redirect( facebook.get_fb_invite_url(req.body.with, req.body.says) );  });
+              function(err)   {  res.redirect('/user?alert='+err);   },
+              function(saved) {
+                db.add_argument(saved._id, req.user.id, req.body.says,
+                  function (fail_text) {  res.redirect('/read?topic='+saved._id+'&alert='+fail_text);  },
+                  function ()          {	res.redirect( facebook.get_fb_invite_url(req.body.with, req.body.says, saved._id) );  });
               });
 });
 
@@ -97,6 +97,7 @@ app.get('/read', ensureAuthenticated, function (req, res) {
   db.load_arguments_for_topic(req.query["topic"], 
     function (err) {  console.log("Failed to load convos:" + err);  res.redirect('/user'); }, 
     function (entries) {  
+      var util = require("util");
       user_ids  = [req.user.id]; //make sure to always have our own user object
       for (i=0; i<entries.length; ++i) {
         user_ids.push(entries[i].user_id);

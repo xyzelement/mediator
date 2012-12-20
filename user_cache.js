@@ -7,10 +7,8 @@ var cache = {}
 
 exports.getUserObjectAsynch = function(id, done) {
   if (cache[id]) {
-    console.log(" ----> HIT " + id);
     done(cache[id]);
   } else {
-    console.log(" ----> MISS " + id);
     facebook.getUserProfile(exports.token, id, function(user) {
       cache[id] = {
         userId:     id,
