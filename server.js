@@ -7,6 +7,7 @@ app = express();
 
 var passport = require('passport');
 var db = require('./db');
+var util  = require("util");
 
 app.use(express.cookieParser());
 app.use(express.bodyParser());
@@ -115,11 +116,40 @@ app.get('/read', ensureAuthenticated, function (req, res) {
     });
 });
 
+function next_status(topic_id, updated_id, cb) {
+    db.load_topic(topic_id, function(topic) {
+      var byA = (topic.from === updated_id);
+   
+      var new_status;
+   
+      console.log("cur stat: " + util.inspect(topic));
+      if (topic.status === "Alleged") {console.log("WTF!");}
+      switch (topic.status) {
+        case "Alleged":
+          console.log("Now: alelged");
+          new_status = (byA ? "Alleged1" : "Responded");
+          break;
+        case "Responded":
+          console.log("Now: respon ded");
+          new_status = (byA ? "XXX" : "Responded1");
+        default:
+          break;
+      }
+      
+      if (new_status && new_status !== topic.status) {
+        db.update_topic_status(topic_id, new_status, cb);
+      } else {
+        console.log("-   No change in status");
+        cb();
+      }
+  });
+}
+
 app.post('/add_comment', ensureAuthenticated, function (req, res) {
   console.log("* /add_comment " + req.body.topic + " " + req.user.id + " " + req.body.says);
   db.add_argument(req.body.topic, req.user.id, req.body.says,
     function (fail_text) { res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);  },
-    function ()          { db.update_topic_status(req.body.topic, "Responded", 
+    function ()          { next_status(req.body.topic, req.user.id,
       function() {res.redirect('/read?topic='+req.body.topic);});                      
     });
 });

@@ -1,4 +1,4 @@
-
+var util = require("util");
 var mongo;
 app.configure('development', function(){
     mongo = { "db":"mydb" }
@@ -38,6 +38,13 @@ exports.get_debug = function ( cb ) {
   } );
 }
 
+exports.load_topic = function(topic_id, cb) {
+  exports.db.topics.find( {_id: ObjectId(topic_id)}, function(err, topic) {
+    console.log(topic_id +" find returned" + err + " " + util.inspect(topic));
+    if (err || !topic) { console.log("Failed to load topic " + topic_id); }
+    else               { cb(topic[0]); }  
+  });
+}
 
 exports.load_topics_for_user = function (user, fail, cb) {
 
