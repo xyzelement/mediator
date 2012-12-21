@@ -84,6 +84,13 @@ exports.load_arguments_for_topic = function(topic, fail, cb) {
     }).sort({_id: 1});
 }
 
+exports.update_topic_status = function(topic_id, new_status, cb) {
+  db.topics.update( {_id: ObjectId(topic_id)}, {$set: {status: new_status}}, function(err, updated) {
+    if( err || !updated ) console.log("Topic status not updated");
+    cb();
+  } );
+}
+
 exports.create_topic = function(from, to, topic, fail, cb) {
 	if (to.length === 0)    { fail("Please specify a user"); return; }
 	if (topic.length === 0) {	fail("Please say something");  return; }	
@@ -91,7 +98,8 @@ exports.create_topic = function(from, to, topic, fail, cb) {
   var t = {
         topic: topic,
         from:  from,
-        to:    to
+        to:    to,
+        status: "Alleged"
   }
   
   exports.db.topics.save(t, 

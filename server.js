@@ -119,7 +119,9 @@ app.post('/add_comment', ensureAuthenticated, function (req, res) {
   console.log("* /add_comment " + req.body.topic + " " + req.user.id + " " + req.body.says);
   db.add_argument(req.body.topic, req.user.id, req.body.says,
     function (fail_text) { res.redirect('/read?topic='+req.body.topic+'&alert='+fail_text);  },
-    function ()          { res.redirect('/read?topic='+req.body.topic);                      });
+    function ()          { db.update_topic_status(req.body.topic, "Responded", 
+      function() {res.redirect('/read?topic='+req.body.topic);});                      
+    });
 });
 
 require('http').createServer(app).listen(8080);
