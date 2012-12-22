@@ -50,19 +50,7 @@ module.exports.load      = function (id, cb) {
 module.exports.list     = function (user_id, cb) {
 	db.db.mediations.find({ $or : [ {from: user_id}, { to: user_id} ]}, {_id: 1, from: 2, to: 3, subject: 4},  
     function (err, mediations) {
-      if (err) { console.log("List error: " + err); }
-
-      console.log(util.inspect(mediations, true, 100, true));
-
+      if (err) { console.log("List error: " + err + " " + util.inspect(mediations)); }
       cb(mediations);
     });
 }
-
-function temp(m) {
-  m.add("Sup", "asss");
-  m.save();
-}
-
-//exports.list("Ed");
-//load(2, temp);
-
