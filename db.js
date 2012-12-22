@@ -1,5 +1,7 @@
 var util = require("util");
 var mongo;
+
+
 app.configure('development', function(){
     mongo = { "db":"mydb" }
 });
@@ -7,6 +9,7 @@ app.configure('production', function(){
     var env = JSON.parse(process.env.VCAP_SERVICES);
     mongo = env['mongodb-1.8'][0]['credentials'];
 });
+
 
 var mongojs = require('mongojs');
 var ObjectId = mongojs.ObjectId;
@@ -23,99 +26,19 @@ var generate_mongo_url = function(obj){
 }
 
 var mongourl = generate_mongo_url(mongo);
-var db = require('mongojs').connect(mongourl, ['topics', 'arguments']);
+var db = require('mongojs').connect(mongourl, ['mediations']);
 
 
 exports.db = db;
 
 exports.get_debug = function ( cb ) {
-  exports.db.topics.find( {}, function (err, out) { 
-    exports.db.arguments.find( {}, function (err1, out1) { 
-      console.log("Topics"+out);
-      console.log("Arguments"+  out1);
-      cb({ topics: out, arguments: out1});
-    } );
+  exports.db.mediations.find( {}, function (err, out) { 
+      console.log(out);
+      cb({ mediations: out});
   } );
-}
-
-exports.load_topic = function(topic_id, cb) {
-  exports.db.topics.find( {_id: ObjectId(topic_id)}, function(err, topic) {
-    console.log(topic_id +" find returned" + err + " " + util.inspect(topic));
-    if (err || !topic) { console.log("Failed to load topic " + topic_id); }
-    else               { cb(topic[0]); }  
-  });
-}
-
-exports.load_topics_for_user = function (user, fail, cb) {
-
-	exports.db.topics.find({ $or : [ {from: user}, { to: user}   ]}, function (err, entries) {
-		if (err || !entries) {
-			fail("Oops. No data found");
-		} else {
-      cb(entries);
-		}
-	});
-}
-
-exports.add_argument = function(topic, user_id, says, fail, cb) {
-
-  if (typeof(topic) === "string") {
-    topic = ObjectId(topic);
-  }
-
-
-	if (says.length === 0) {
-    fail("You probably want to say something here");		
-		return;
-	}
-  exports.db.arguments.save({ topic: topic, user_id: user_id, says: says}, function(err, saved) {
-    if (err || !saved) {  fail("User not saved");  return; }    
-    cb(saved);
-  });
-}
-
-exports.load_arguments_for_topic = function(topic, fail, cb) {
-
-
-  if(!topic || topic.length==0) {
-    fail("You need a topic!");
-    return;
-  }
-
-  exports.db.arguments.find({topic: ObjectId(topic)}, 
-
-    function(err, entities) {
-        if (err || !entities) fail(err);
-        else if (!entities)   fail("No entities loaded");
-        else cb(entities);
-    }).sort({_id: 1});
-}
-
-exports.update_topic_status = function(topic_id, new_status, cb) {
-  db.topics.update( {_id: ObjectId(topic_id)}, {$set: {status: new_status}}, function(err, updated) {
-    if( err || !updated ) console.log("Topic status not updated");
-    cb();
-  } );
-}
-
-exports.create_topic = function(from, to, topic, fail, cb) {
-	if (to.length === 0)    { fail("Please specify a user"); return; }
-	if (topic.length === 0) {	fail("Please say something");  return; }	
-      
-  var t = {
-        topic: topic,
-        from:  from,
-        to:    to,
-        status: "Alleged"
-  }
-  
-  exports.db.topics.save(t, 
-    function(err, saved){cb(saved);});
-  
 }
 
 exports.delete_everything = function(cb) {
-  exports.db.topics.remove();
-  exports.db.arguments.remove();
+  exports.db.mediations.remove();
   cb();
 }

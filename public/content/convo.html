@@ -71,14 +71,14 @@
 		
 		{{ for(var i in it.argument) { }}
 		<div class="11well well-small">
-			{{? it.argument[i].user_id == it.user_id}}
+			{{? it.argument[i].by == it.user_id}}
         
-				<span class="label label-info">{{=it.users[it.argument[i].user_id].displayName}}</span>
+				<span class="label label-info">{{=it.users[it.argument[i].by].displayName}}</span>
 			{{??}}
-				<span class="label">           {{=it.users[it.argument[i].user_id].displayName}}</span></span>
+				<span class="label">           {{=it.users[it.argument[i].by].displayName}}</span></span>
 			{{?}}
 			
-			&nbsp; {{=it.argument[i].says}}
+			&nbsp; {{=it.argument[i].text}}
 		</div>
 		{{ } }}
 
