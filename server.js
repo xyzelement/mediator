@@ -81,7 +81,8 @@ app.post('/start', ensureAuthenticated, function (req, res) {
   m.from = req.user.id;
   m.to   = req.body.with;
   m.subject = req.body.says;
-  m.add(req.user.id, req.body.says);
+
+  m.add(req.user.id, "Alleged", req.body.says);
   m.save();
 
   //EMTODO: put this in callback?
@@ -98,7 +99,7 @@ app.get('/read', ensureAuthenticated, function (req, res) {
     user_cache.create_user_data(req.user.token, user_ids, {} , function(users) { 
 
       var obj = {   topic:          req.query["topic"],
-                      argument :    topic.arguments,
+                      topic :       topic,
                       alert :       req.query["alert"],
                       user_id:      req.user.id,
                       users:        users         };
@@ -110,10 +111,10 @@ app.get('/read', ensureAuthenticated, function (req, res) {
 
 
 app.post('/add_comment', ensureAuthenticated, function (req, res) {
-  console.log("* /add_comment " + req.body.topic + " " + req.user.id + " " + req.body.says);
+  console.log("* /add_comment " + req.body.topic + " " + req.user.id + " " + req.body.says + " " + req.body.action);
 
   mediations.load(req.body.topic, function(topic) {
-    topic.add(req.user.id, req.body.says);
+    topic.add(req.user.id, req.body.action, req.body.says);
     topic.save();
   });
  

@@ -65,25 +65,25 @@
 
       <!-- Main hero unit for a primary marketing message or call to action -->
       <!-- <div class="hero-unit"> -->
-        <h1>{{=it.topic}}</h1>
+        <h1>{{=it.topic.subject}}</h1>
         <legend>The discussion thus far</legend>
 
 		
-		{{ for(var i in it.argument) { }}
+		{{ for(var i in it.topic.arguments) { }}
 		<div class="11well well-small">
-			{{? it.argument[i].by == it.user_id}}
+			{{? it.topic.arguments[i].by == it.user_id}}
         
-				<span class="label label-info">{{=it.users[it.argument[i].by].displayName}}</span>
+				<span class="label label-info">{{=it.users[it.topic.arguments[i].by].displayName}}</span>
 			{{??}}
-				<span class="label">           {{=it.users[it.argument[i].by].displayName}}</span></span>
+				<span class="label">           {{=it.users[it.topic.arguments[i].by].displayName}}</span></span>
 			{{?}}
 			
-			&nbsp; {{=it.argument[i].text}}
+			&nbsp; {{=it.topic.arguments[i].text}}
 		</div>
 		{{ } }}
 
 		</br></br>
-	<div class="hero-unit">
+<div class="hero-unit"> 
 
 <form class="form-search" method="post" action="/add_comment">
 	<legend>Your Response:</legend>
@@ -94,11 +94,21 @@
 	</div>
 	{{?}}
 	<!-- <input name="name" type="text" placeholder="I am" class="input-medium search-query"> -->
-    <input name="topic" type="hidden" value="{{=it.topic}}"/>
-    <input name="says" type="text" placeholder="here's how I feel..." class="input-medium search-query"/>
+    <input name="topic" type="hidden" value="{{=it.topic._id}}"/>
+
+    {{ for(var i in it.topic.next_actions) { }}
+      <label class="radio">
+      <input type="radio" name="action" id="{{=it.topic.next_actions[i].action}}" value="{{=it.topic.next_actions[i].action}}">
+      {{=it.topic.next_actions[i].text}}
+      </label></br>
+    {{ } }}
+
+    <textarea name="says" placeholder="..." class="input-block-level" rows=10></textarea>
     <button type="submit" class="btn btn-info">Submit</button>
+
+    
 </form>
-	</div>
+</div> 
 	
       <hr>
 
