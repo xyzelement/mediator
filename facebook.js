@@ -90,7 +90,7 @@ exports.get_fb_invite_url = function (user_to_invite, topic, topic_id) {
   return 'https://www.facebook.com/dialog/apprequests?app_id='+ conf.FACEBOOK_APP_ID
           +'&title=Notify the other guy'
           //+'&redirect_uri=http://localhost:8080/read?topic=' + topic_id
-          +'&redirect_uri=http://localhost:8080/'
+          +'&redirect_uri=' + conf.MY_URL
           +'&to=' + user_to_invite
           +'&message=I am using Mediator to discuss an issue with you: '+ topic
 

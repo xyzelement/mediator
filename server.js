@@ -1,8 +1,10 @@
-var facebook   = require("./facebook");
-var user_cache = require("./user_cache");
 var templates  = require('./templates');
 var express = require("express");
 app = express();
+
+var user_cache = require("./user_cache");
+var facebook   = require("./facebook");
+
 
 var passport = require('passport');
 var db = require('./db');

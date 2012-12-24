@@ -1,14 +1,6 @@
 var util = require("util");
-var mongo;
+var mongo = { "db":"mydb" }
 
-
-app.configure('development', function(){
-    mongo = { "db":"mydb" }
-});
-app.configure('production', function(){
-    var env = JSON.parse(process.env.VCAP_SERVICES);
-    mongo = env['mongodb-1.8'][0]['credentials'];
-});
 
 
 var mongojs = require('mongojs');
