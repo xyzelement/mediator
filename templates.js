@@ -5,8 +5,7 @@ var user_template = "";
 var start_template = "";
 
 var fs = require('fs');
-// TODO: you'll probably want to include an 'encoding' to fs.readFile (utf8 works)
-// TODO: 'readFileSync'
+
 fs.readFile(__dirname + '/public/content/convo.html', function (err, data) {
 	if (err) { throw err; }
 	convo_template = doT.template(data.toString());

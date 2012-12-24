@@ -21,7 +21,6 @@ app.use(app.router);
 app.use(express.static(__dirname + '/public'));
 
 var login = require("./login");
-var aux = require("./auxilary");
 
 function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) { return next(); }
@@ -122,6 +121,15 @@ app.post('/add_comment', ensureAuthenticated, function (req, res) {
  
   //EMTODO: put this in callback? 
   res.redirect('/read?topic='+req.body.topic);
+});
+
+
+app.get('/debug', function(req,res) { 
+  db.get_debug( function(out) { res.end( util.inspect(out) ); }); 
+});
+
+app.get('/remove', /*ensureAuthenticated,*/ function (req, res) {
+  db.delete_everything( function() {res.redirect('/');}) ;
 });
 
 require('http').createServer(app).listen(8080);
