@@ -31,7 +31,7 @@ app.get('/fb',
 app.get('/fbcb', 
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
-    console.log("LogIn: " + util.inspect(req.user.username 
+    conf.log("LogIn: " + util.inspect(req.user.username 
                          + " " + req.user.id + " " + req.user.profileUrl));
     res.redirect('/');
 });
