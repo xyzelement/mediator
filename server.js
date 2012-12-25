@@ -1,8 +1,7 @@
 var conf = require("./config.js");  
 
 var templates  = require('./templates');
-var express = require("express");
-app = express();
+var express = require("express"); app = express();
 
 var user_cache = require("./user_cache");
 var facebook   = require("./facebook");
@@ -122,6 +121,9 @@ app.post('/add_comment', ensureAuthenticated, function (req, res) {
     topic.save();
   });
  
+  //EMTODO: this should be more targeted!
+  io.sockets.emit('refresh', { hello: 'world' });
+   
   //EMTODO: put this in callback? 
   res.redirect('/read?topic='+req.body.topic);
 });
@@ -138,7 +140,14 @@ app.get('/remove', /*ensureAuthenticated,*/ function (req, res) {
   res.redirect('/');
 });
 
+server = require('http').createServer(app).listen(8080);
 
-  
+var io = require('socket.io').listen(server);
 
-require('http').createServer(app).listen(8080);
+
+//EMTODO: register sessions
+io.sockets.on('connection', function (socket) {
+  console.log("Someone connected" + util.inspect(socket.handshake, true, 100, true));  
+});
+
+
