@@ -7,21 +7,34 @@ function Mediation(){
 
 var p = Mediation.prototype;
 
+p.status_from_action = function(action) {
+  console.log("Current status: " + this.status + "   " + action);
+
+  switch (action) {
+  case "Start"    : return "Alleged";
+  case "Restate"  : return "Restated";
+  case "Question" : return "Questioned";
+  case "Clarify"  : return "Alleged";
+  case "Accept"   : return "Accepted";
+  }
+
+}
+
 p.set_status = function (status) {
   this.status = status;
 
   //EMTODO: this actually depends on who is running the system
   switch(this.status) {
     case "Alleged": this.next_actions = [ 
-        {action: "Restated",   text: "I think I understand. Let me restate in my own words: "},
-        {action: "Questioned", text: "I don't quite understand, can you please clarify: "} ]; 
-      break;
+        {action: "Restate",   text: "I think I understand. Let me restate in my own words: "},
+        {action: "Question",  text: "I don't quite understand, can you please clarify: "} ]; 
+        break;
     case "Questioned": this.next_actions = [ 
-        {action: "Alleged",   text: "Here's my clarification: "} ];
+        {action: "Clarify",    text: "Here's my clarification: "} ];
         break;
     case "Restated": this.next_actions = [ 
-      {action: "Accepted",   text: "That's right! "},
-      {action: "Alleged",    text: "That's not quite it. Let me clarify: "}];
+        {action: "Accept",     text: "That's right! "},
+        {action: "Clarify",    text: "That's not quite it. Let me clarify: "}];
 
     default: console.log("Unknow status: " + this.status);
   }
@@ -40,8 +53,9 @@ p.save = function () {
 }
 
 p.add = function(by, action, text) {
-  this.arguments.push({by: by, text: text});
-  this.set_status(action);
+  this.arguments.push({by: by, action: action, text: text});
+  var status = this.status_from_action(action);
+  this.set_status(status);
 }
 
 
@@ -50,6 +64,7 @@ module.exports.Mediation = Mediation;
 
 var mongojs = require('mongojs');
 var ObjectId = mongojs.ObjectId;
+
 module.exports.load      = function (id, cb) {
 
   id = ObjectId(id);

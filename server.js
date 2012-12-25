@@ -85,7 +85,7 @@ app.post('/start', ensureAuthenticated, function (req, res) {
   m.to   = req.body.with;
   m.subject = req.body.says;
 
-  m.add(req.user.id, "Alleged", req.body.says);
+  m.add(req.user.id, "Start", req.body.says);
   m.save();
 
   //EMTODO: put this in callback?

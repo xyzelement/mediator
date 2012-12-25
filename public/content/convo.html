@@ -74,21 +74,25 @@
       <!-- Main hero unit for a primary marketing message or call to action -->
       <!-- <div class="hero-unit"> -->
         <h1>{{=it.topic.subject}}</h1>
-        <legend>The discussion thus far</legend>
 
-		
-		{{ for(var i in it.topic.arguments) { }}
-		<div class="11well well-small">
-			{{? it.topic.arguments[i].by == it.user_id}}
-        
-				<span class="label label-info">{{=it.users[it.topic.arguments[i].by].displayName}}</span>
-			{{??}}
-				<span class="label">           {{=it.users[it.topic.arguments[i].by].displayName}}</span></span>
-			{{?}}
-			
-			&nbsp; {{=it.topic.arguments[i].text}}
-		</div>
+		{{ for(var i in it.topic.arguments) { }}		
+        <div style="border: 1px solid; padding: 5px;">            
+            <p>
+              <img src="{{=it.users[it.topic.arguments[i].by].pictureUrl}}" float="left"/>
+              <strong>{{=it.users[it.topic.arguments[i].by].displayName}}</strong>
+              <span class="muted"> 
+                {{? it.topic.arguments[i].action === "Start"}}Started the discussion
+                {{?? it.topic.arguments[i].action === "Question"}}Asked a clarifying question
+                {{??}}Something else
+                {{?}}            
+              </span>
+            </p>
+            <p>
+              {{=it.topic.arguments[i].text}}
+            </p>
+        </div>
 		{{ } }}
+
     </br></br>
 
     {{? it.topic.status === "Alleged"}}
@@ -118,7 +122,7 @@
     {{?}}
 
 		</br></br>
-<div class="hero-unit"> 
+<!-- <div class="hero-unit">  -->
 
 <form class="form-search" method="post" action="/add_comment">
 	<legend>Your Response:</legend>
@@ -143,7 +147,7 @@
 
     
 </form>
-</div> 
+<!-- </div>  -->
 	
       <hr>
 
