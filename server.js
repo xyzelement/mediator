@@ -9,7 +9,6 @@ var facebook   = require("./facebook");
 
 
 var passport = require('passport');
-var db = require('./db');
 var mediations = require('./mediation');
 var util  = require("util");
 
@@ -129,11 +128,14 @@ app.post('/add_comment', ensureAuthenticated, function (req, res) {
 
 
 app.get('/debug', function(req,res) { 
-  db.get_debug( function(out) { res.end( util.inspect(out) ); }); 
+  conf.db.mediations.find( {}, function (err, out) { 
+      console.log(out);
+      res.end( util.inspect(out) ); }); 
 });
 
 app.get('/remove', /*ensureAuthenticated,*/ function (req, res) {
-  db.delete_everything( function() {res.redirect('/');}) ;
+  conf.db.mediations.remove();
+  res.redirect('/');
 });
 
 

@@ -1,4 +1,4 @@
-var db = require("./db");
+var conf = require("./config");
 var util = require("util");
 
 function Mediation(){
@@ -33,7 +33,7 @@ p.print = function () {
 
 p.save = function () {
   var obj = this;
-  db.db.mediations.save(obj, 
+  conf.db.mediations.save(obj, 
                         function(err, saved) { 
                           if (err) { console.log("Error saving: " + util.inspect(obj)); }
                         });
@@ -53,7 +53,7 @@ var ObjectId = mongojs.ObjectId;
 module.exports.load      = function (id, cb) {
 
   id = ObjectId(id);
-  db.db.mediations.findOne({_id: id}, 
+  conf.db.mediations.findOne({_id: id}, 
     function (err, found) {
       if (err) { console.log("Load error: " + err); }
       
@@ -70,7 +70,7 @@ module.exports.load      = function (id, cb) {
 }
 
 module.exports.list     = function (user_id, cb) {
-	db.db.mediations.find(
+	conf.db.mediations.find(
     { $or : [ {from: user_id}, { to: user_id} ]},
     {_id: 1, from: 2, to: 3, subject: 4, status: 5},
     function (err, mediations) {

@@ -21,14 +21,6 @@ fs.readFile(__dirname + '/public/content/start.html', function (err, data) {
 	start_template = doT.template(data.toString());
 });
 
-exports.user_page = function(user){
-	return user_template(user);
-}
-
-exports.start_page = function(user){
-	return start_template(user);
-}
-
-exports.convo_page = function(user){
-	return convo_template(user);
-}
+exports.user_page  = function(user){ return user_template(user);  }
+exports.start_page = function(user){ return start_template(user); }
+exports.convo_page = function(user){ return convo_template(user); }
