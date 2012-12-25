@@ -81,6 +81,33 @@
 			&nbsp; {{=it.topic.arguments[i].text}}
 		</div>
 		{{ } }}
+    </br></br>
+
+    {{? it.topic.status === "Alleged"}}
+      <div class="alert alert-info">
+        A mediation has been initiated. Please read the issue carefully and decide if you understand it. If not,
+        please ask for clarification. If yes, let's make sure everyone's on the same page so please restate your
+        understanding of the issue in your own words.
+      </div>
+    {{?? it.topic.status === "Questioned"}}
+      <div class="alert alert-info">
+        Your mediation partner has requested a clarification about the issue. Please answer their question. It's
+        a good idea to explain it even if you feel you have already explained this point or it should be obvious.
+        This is a very important step to ensure you're not talking past each other.
+      </div>
+    {{?? it.topic.status === "Restated"}}
+      <div class="alert alert-info">
+        Your mediation partner indicated that they understood the issue, and they have restated it in their own
+        words. Please read through their take carefully - this is your opportunity to ensure you're talking about
+        the same thing. If they got it perfectly, let them know. If not, explain to them what they are missing.
+      </div>      
+    {{?? it.topic.status === "Accepted"}}
+      <div class="alert alert-success">
+        Awesome! You're on the same page about what the issue is. Now we can start working on the resolution.
+       </div>
+    {{??}}
+      what?
+    {{?}}
 
 		</br></br>
 <div class="hero-unit"> 
