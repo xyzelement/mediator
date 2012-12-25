@@ -1,3 +1,5 @@
+var conf = require("./config.js");  
+
 var templates  = require('./templates');
 var express = require("express");
 app = express();
@@ -26,6 +28,7 @@ function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) { return next(); }
 	res.redirect('/content/login.html')
 }
+
 
 app.get('/', ensureAuthenticated, function (req, res) {
 	res.redirect('/user');
@@ -58,6 +61,7 @@ app.get('/start', ensureAuthenticated, function (req, res) {
   console.log("* /start(g) " + w);
   if (!w) {
     facebook.getFbFriends(req.user.token, req.user.id, function(friend_str) { 
+
       user_cache.create_user_data(req.user.token, [req.user.id], {}, function(users) {
         res.end(templates.start_page({ user_id:    req.user.id,
          users:      users,
@@ -131,5 +135,8 @@ app.get('/debug', function(req,res) {
 app.get('/remove', /*ensureAuthenticated,*/ function (req, res) {
   db.delete_everything( function() {res.redirect('/');}) ;
 });
+
+
+  
 
 require('http').createServer(app).listen(8080);

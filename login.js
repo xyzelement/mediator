@@ -1,4 +1,5 @@
 var passport = require('passport');
+var util = require('util');
 var conf = require("./config.js");   
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
@@ -30,18 +31,10 @@ app.get('/fb',
 app.get('/fbcb', 
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
+    console.log("LogIn: " + util.inspect(req.user.username 
+                         + " " + req.user.id + " " + req.user.profileUrl));
     res.redirect('/');
 });
-
-app.get('/login', 
-  function (req, res) {
-    passport.authenticate('local', { failureRedirect : '/content/login.html', failureFlash : false }),
-    function (req, res) {
-      user_cache.token = req.user.token;
-      res.redirect('/');
-    }
-  }
-);
 
 
 app.get('/logout', function(req, res){
