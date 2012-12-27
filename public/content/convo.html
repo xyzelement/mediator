@@ -1,178 +1,223 @@
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Mediator</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+<head>
+  <meta charset="utf-8">
+  <title>Mediator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <!-- Le styles -->
+  <link href="../assets/css/bootstrap.css" rel="stylesheet">
+  <style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+  /* Custom container */
+  .container-narrow {
+    margin: 0 auto;
+    max-width: 700px;
+  }   
+  </style>
+  <link href="../assets/css/bootstrap-responsive.css" rel="stylesheet">
 
-    <!-- Le styles -->
-    <link href="../assets/css/bootstrap.css" rel="stylesheet">
-    <style type="text/css">
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-      /* Custom container */
-      .container-narrow {
-        margin: 0 auto;
-        max-width: 700px;
-      }	  
-    </style>
-    <link href="../assets/css/bootstrap-responsive.css" rel="stylesheet">
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      var socket = io.connect('http://localhost');
-      socket.on('refresh', function (data) {
-        document.location.reload(true);        
-      });
-    </script>
-
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
-    <!-- Fav and touch icons -->
-    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
-  </head>
+  <script src="/socket.io/socket.io.js">
+  </script>
+  <script>
+  var socket = io.connect('http://localhost');
+  socket.on('refresh', function (data){
+            document.location.reload(true);        
+           });
+  </script>
+  <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <!-- Fav and touch icons -->
+  <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+</head>
 
   <body>
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="/">The Mediator</a>
-          <div class="nav-collapse collapse">
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar">
+        </span>
+        <span class="icon-bar">
+        </span>
+        <span class="icon-bar">
+        </span>
+        </a> <a class="brand" href="/">The Mediator</a>
+        <div class="nav-collapse collapse">
           <ul class="nav">
-           <li class=""><a href="/user">{{=it.users[it.user_id].displayName}}</a></li>
-           <li class=""><a href="/logout">Log Out</a></li>
-           </ul>
-          </div><!--/.nav-collapse -->
+            <li class="">
+              <a href="/user">{{=it.users[it.user_id].displayName}}</a>
+            </li>
+            <li class="">
+              <a href="/logout">Log Out</a>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
 
-        </div>
-	  </div>
-	</div>
-        </div>
       </div>
     </div>
+  </div>
+  </div>
+  </div>
+  </div>
 
-    <div class="container-narrow">
 
-      <!-- Main hero unit for a primary marketing message or call to action -->
-      <!-- <div class="hero-unit"> -->
-        <h1>{{=it.topic.subject}}</h1>
 
-		{{ for(var i in it.topic.arguments) { }}		
-        <div style="border: 1px solid; padding: 5px;">            
-            <p>
-              <img src="{{=it.users[it.topic.arguments[i].by].pictureUrl}}" float="left"/>
-              <strong>{{=it.users[it.topic.arguments[i].by].displayName}}</strong>
-              <span class="muted"> 
-                {{? it.topic.arguments[i].action === "Start"}}Started the discussion
-                {{?? it.topic.arguments[i].action === "Question"}}Asked a clarifying question
-                {{??}}Something else
-                {{?}}            
-              </span>
-            </p>
-            <p>
-              {{=it.topic.arguments[i].text}}
-            </p>
+  <div class="container-narrow">
+
+    <h1>{{=it.topic.subject}}</h1>
+
+    <div class="accordion" id="accordion2">
+
+      {{ for(var i in it.topic.arguments) { }}
+
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{=i}}">
+          <img src="{{=it.users[it.topic.arguments[i].by].pictureUrl}}" align="left"/>
+
+          <blockquote>
+            {{=it.topic.arguments[i].text}} <small>{{=it.users[it.topic.arguments[i].by].displayName}}</small>
+          </blockquote>
+          </a>
         </div>
-		{{ } }}
+        <div id="collapse{{=i}}" class="accordion-body collapse {{? i == (it.topic.arguments.length - 1) }}in{{?}}">
+          <div class="accordion-inner">
 
-    </br></br>
+            {{? it.topic.arguments[i].action === "Start"}}
+            <div class="alert alert-info">
+              A mediation has been initiated. Please read the issue carefully and decide if 
+              you understand it. If not, please ask for clarification. If yes, let's make sure 
+              everyone's on the same page so please restate your understanding of the issue in 
+              your own words.
+            </div>
+            {{?? it.topic.arguments[i].action === "Question"}}
+            <div class="alert alert-info">
+              Your mediation partner has requested a clarification about the issue. Please 
+              answer their question. It's a good idea to explain it even if you feel you have 
+              already explained this point or it should be obvious. This is a very important 
+              step to ensure you're not talking past each other.
+            </div>
+            {{?? it.topic.arguments[i].action === "Restate"}}
+            <div class="alert alert-info">
+              Your mediation partner indicated that they understood the issue, and they have 
+              restated it in their own words. Please read through their take carefully - this 
+              is your opportunity to ensure you're talking about the same thing. If they got 
+              it perfectly, let them know. If not, explain to them what they are missing.
+            </div>
+            {{?? it.topic.arguments[i].action === "Accept"}}
+            <div class="alert alert-success">
+              Awesome! You're on the same page about what the issue is. Now we can start 
+              working on the resolution.
+            </div>
+            {{??}} {{=it.topic.arguments[i].action}} {{?}}
 
-    {{? it.topic.status === "Alleged"}}
-      <div class="alert alert-info">
-        A mediation has been initiated. Please read the issue carefully and decide if you understand it. If not,
-        please ask for clarification. If yes, let's make sure everyone's on the same page so please restate your
-        understanding of the issue in your own words.
+          </div>
+        </div>
+
       </div>
-    {{?? it.topic.status === "Questioned"}}
-      <div class="alert alert-info">
-        Your mediation partner has requested a clarification about the issue. Please answer their question. It's
-        a good idea to explain it even if you feel you have already explained this point or it should be obvious.
-        This is a very important step to ensure you're not talking past each other.
+
+      {{ } }}
+    </div>
+    <!--
+  </br></br>
+
+  {{? it.topic.status === "Alleged"}}
+    <div class="alert alert-info">
+      A mediation has been initiated. Please read the issue carefully and decide if you understand it. If not,
+      please ask for clarification. If yes, let's make sure everyone's on the same page so please restate your
+      understanding of the issue in your own words.
+    </div>
+  {{?? it.topic.status === "Questioned"}}
+    <div class="alert alert-info">
+      Your mediation partner has requested a clarification about the issue. Please answer their question. It's
+      a good idea to explain it even if you feel you have already explained this point or it should be obvious.
+      This is a very important step to ensure you're not talking past each other.
+    </div>
+  {{?? it.topic.status === "Restated"}}
+    <div class="alert alert-info">
+      Your mediation partner indicated that they understood the issue, and they have restated it in their own
+      words. Please read through their take carefully - this is your opportunity to ensure you're talking about
+      the same thing. If they got it perfectly, let them know. If not, explain to them what they are missing.
+    </div>      
+  {{?? it.topic.status === "Accepted"}}
+    <div class="alert alert-success">
+      Awesome! You're on the same page about what the issue is. Now we can start working on the resolution.
+     </div>
+  {{??}}
+    what?
+  {{?}}
+--></br>
+    </br>
+    <!-- <div class="hero-unit">  -->
+    <form class="form-search" method="post" action="/add_comment">
+      <legend>
+      Your Response:
+      </legend>
+
+      {{? it.alert }}
+      <div class="alert">
+        <strong>Oops!</strong> {{=it.alert}}
       </div>
-    {{?? it.topic.status === "Restated"}}
-      <div class="alert alert-info">
-        Your mediation partner indicated that they understood the issue, and they have restated it in their own
-        words. Please read through their take carefully - this is your opportunity to ensure you're talking about
-        the same thing. If they got it perfectly, let them know. If not, explain to them what they are missing.
-      </div>      
-    {{?? it.topic.status === "Accepted"}}
-      <div class="alert alert-success">
-        Awesome! You're on the same page about what the issue is. Now we can start working on the resolution.
-       </div>
-    {{??}}
-      what?
-    {{?}}
+      {{?}}
+      <!-- <input name="name" type="text" placeholder="I am" class="input-medium search-query"> -->
+      <input name="topic" type="hidden" value="{{=it.topic._id}}"/>
 
-		</br></br>
-<!-- <div class="hero-unit">  -->
-
-<form class="form-search" method="post" action="/add_comment">
-	<legend>Your Response:</legend>
-
-	{{? it.alert }}
-	<div class="alert">
-	  <strong>Oops!</strong> {{=it.alert}}
-	</div>
-	{{?}}
-	<!-- <input name="name" type="text" placeholder="I am" class="input-medium search-query"> -->
-    <input name="topic" type="hidden" value="{{=it.topic._id}}"/>
-
-    {{ for(var i in it.topic.next_actions) { }}
+      {{ for(var i in it.topic.next_actions) { }}
       <label class="radio">
       <input type="radio" name="action" id="{{=it.topic.next_actions[i].action}}" value="{{=it.topic.next_actions[i].action}}">
       {{=it.topic.next_actions[i].text}}
-      </label></br>
-    {{ } }}
+      </label>
+      </br>
+      {{ } }}
 
-    <textarea name="says" placeholder="..." class="input-block-level" rows=10></textarea>
-    <button type="submit" class="btn btn-info">Submit</button>
+      <textarea name="says" placeholder="..." class="input-block-level" rows="10"></textarea>
+      <button type="submit" class="btn btn-info">Submit</button>
 
-    
-</form>
-<!-- </div>  -->
-	
-      <hr>
 
-      <footer>
-        <p>&copy; The Mediator 2012</p>
-      </footer>
+    </form>
+    <!-- </div>  -->
+    <hr>
 
-    </div> <!-- /container -->
+    <footer>
+    <p>
+    &copy; The Mediator 2012
+    </p>
+    </footer>
 
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="../assets/js/jquery.js"></script>
-    <script src="../assets/js/bootstrap-transition.js"></script>
-    <script src="../assets/js/bootstrap-alert.js"></script>
-    <script src="../assets/js/bootstrap-modal.js"></script>
-    <script src="../assets/js/bootstrap-dropdown.js"></script>
-    <script src="../assets/js/bootstrap-scrollspy.js"></script>
-    <script src="../assets/js/bootstrap-tab.js"></script>
-    <script src="../assets/js/bootstrap-tooltip.js"></script>
-    <script src="../assets/js/bootstrap-popover.js"></script>
-    <script src="../assets/js/bootstrap-button.js"></script>
-    <script src="../assets/js/bootstrap-collapse.js"></script>
-    <script src="../assets/js/bootstrap-carousel.js"></script>
-    <script src="../assets/js/bootstrap-typeahead.js"></script>
-
+  </div> <!-- /container -->
+  <!-- Le javascript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="../assets/js/jquery.js">
+  </script>
+  <script src="../assets/js/bootstrap.js">
+  </script>
+  <!--
+  <script src="../assets/js/bootstrap-transition.js"></script>
+  <script src="../assets/js/bootstrap-alert.js"></script>
+  <script src="../assets/js/bootstrap-modal.js"></script>
+  <script src="../assets/js/bootstrap-dropdown.js"></script>
+  <script src="../assets/js/bootstrap-scrollspy.js"></script>
+  <script src="../assets/js/bootstrap-tab.js"></script>
+  <script src="../assets/js/bootstrap-tooltip.js"></script>
+  <script src="../assets/js/bootstrap-popover.js"></script>
+  <script src="../assets/js/bootstrap-button.js"></script>
+  <script src="../assets/js/bootstrap-collapse.js"></script>
+  <script src="../assets/js/bootstrap-carousel.js"></script>
+  <script src="../assets/js/bootstrap-typeahead.js"></script>
+  -->
   </body>
 </html>
