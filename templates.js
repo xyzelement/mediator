@@ -23,4 +23,13 @@ fs.readFile(__dirname + '/public/content/start.html', function (err, data) {
 
 exports.user_page  = function(user){ return user_template(user);  }
 exports.start_page = function(user){ return start_template(user); }
-exports.convo_page = function(user){ return convo_template(user); }
+
+//EMTODO: go back to caching
+exports.convo_page = function(user){ 
+  fs.readFile(__dirname + '/public/content/convo.html', function (err, data) {
+    if (err) { throw err; }
+    convo_template = doT.template(data.toString());
+  });
+
+  return convo_template(user); 
+}

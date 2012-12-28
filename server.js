@@ -103,7 +103,6 @@ app.get('/read', ensureAuthenticated, function (req, res) {
 
       var obj = {   topic:          req.query["topic"],
                       topic :       topic,
-                      alert :       req.query["alert"],
                       user_id:      req.user.id,
                       users:        users         };
 

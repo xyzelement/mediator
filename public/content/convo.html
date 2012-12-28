@@ -73,106 +73,60 @@
   </div>
   </div>
 
-
-
+  
   <div class="container-narrow">
+    <div style="height: 400px; overflow: auto;">
 
-    <h1>{{=it.topic.subject}}</h1>
 
-    <div class="accordion" id="accordion2">
-
+    <div id="accordion2">
       {{ for(var i in it.topic.arguments) { }}
 
-      <div class="accordion-group">
-        <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{=i}}">
-          <img src="{{=it.users[it.topic.arguments[i].by].pictureUrl}}" align="left"/>
+		<div class="well">
+			<div>
+				<div class="collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{=i}}">
+        
 
-          <blockquote>
-            {{=it.topic.arguments[i].text}} <small>{{=it.users[it.topic.arguments[i].by].displayName}}</small>
-          </blockquote>
-          </a>
-        </div>
-        <div id="collapse{{=i}}" class="accordion-body collapse {{? i == (it.topic.arguments.length - 1) }}in{{?}}">
-          <div class="accordion-inner">
+        <img src="{{=it.users[it.topic.arguments[i].by].pictureUrl}}" class="img-rounded pull-left" width="30">
+        <strong class="pull-left"> &nbsp; {{=it.users[it.topic.arguments[i].by].displayName}} &nbsp; </strong> 
 
+        {{=it.topic.arguments[i].text}}
+				</div>
+			</div>
+			<div id="collapse{{=i}}" class="collapse" style="height: 0px;">
+				<p class="text-info">
+            <br/>
             {{? it.topic.arguments[i].action === "Start"}}
-            <div class="alert alert-info">
               A mediation has been initiated. Please read the issue carefully and decide if 
               you understand it. If not, please ask for clarification. If yes, let's make sure 
               everyone's on the same page so please restate your understanding of the issue in 
               your own words.
-            </div>
             {{?? it.topic.arguments[i].action === "Question"}}
-            <div class="alert alert-info">
               Your mediation partner has requested a clarification about the issue. Please 
               answer their question. It's a good idea to explain it even if you feel you have 
               already explained this point or it should be obvious. This is a very important 
               step to ensure you're not talking past each other.
-            </div>
             {{?? it.topic.arguments[i].action === "Restate"}}
-            <div class="alert alert-info">
               Your mediation partner indicated that they understood the issue, and they have 
               restated it in their own words. Please read through their take carefully - this 
               is your opportunity to ensure you're talking about the same thing. If they got 
               it perfectly, let them know. If not, explain to them what they are missing.
-            </div>
             {{?? it.topic.arguments[i].action === "Accept"}}
-            <div class="alert alert-success">
               Awesome! You're on the same page about what the issue is. Now we can start 
               working on the resolution.
-            </div>
-            {{??}} {{=it.topic.arguments[i].action}} {{?}}
-
-          </div>
-        </div>
-
-      </div>
+            {{??}} {{=it.topic.arguments[i].action}} {{?}}						 
+				</p>
+			</div>
+		</div>       
+     
 
       {{ } }}
     </div>
-    <!--
-  </br></br>
 
-  {{? it.topic.status === "Alleged"}}
-    <div class="alert alert-info">
-      A mediation has been initiated. Please read the issue carefully and decide if you understand it. If not,
-      please ask for clarification. If yes, let's make sure everyone's on the same page so please restate your
-      understanding of the issue in your own words.
-    </div>
-  {{?? it.topic.status === "Questioned"}}
-    <div class="alert alert-info">
-      Your mediation partner has requested a clarification about the issue. Please answer their question. It's
-      a good idea to explain it even if you feel you have already explained this point or it should be obvious.
-      This is a very important step to ensure you're not talking past each other.
-    </div>
-  {{?? it.topic.status === "Restated"}}
-    <div class="alert alert-info">
-      Your mediation partner indicated that they understood the issue, and they have restated it in their own
-      words. Please read through their take carefully - this is your opportunity to ensure you're talking about
-      the same thing. If they got it perfectly, let them know. If not, explain to them what they are missing.
-    </div>      
-  {{?? it.topic.status === "Accepted"}}
-    <div class="alert alert-success">
-      Awesome! You're on the same page about what the issue is. Now we can start working on the resolution.
-     </div>
-  {{??}}
-    what?
-  {{?}}
---></br>
-    </br>
-    <!-- <div class="hero-unit">  -->
+</div>
     <form class="form-search" method="post" action="/add_comment">
-      <legend>
-      Your Response:
-      </legend>
 
-      {{? it.alert }}
-      <div class="alert">
-        <strong>Oops!</strong> {{=it.alert}}
-      </div>
-      {{?}}
-      <!-- <input name="name" type="text" placeholder="I am" class="input-medium search-query"> -->
+      <legend>Response</legend>
+
       <input name="topic" type="hidden" value="{{=it.topic._id}}"/>
 
       {{ for(var i in it.topic.next_actions) { }}
@@ -183,7 +137,7 @@
       </br>
       {{ } }}
 
-      <textarea name="says" placeholder="..." class="input-block-level" rows="10"></textarea>
+      <textarea name="says" placeholder="..." class="input-block-level" rows="3"></textarea>
       <button type="submit" class="btn btn-info">Submit</button>
 
 
