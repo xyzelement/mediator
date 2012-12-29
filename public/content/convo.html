@@ -125,6 +125,7 @@
             </div>
             <div class="modal-body">
                 <form class="form-search" method="post" action="/add_comment">
+                    <p id="popup_instructions">Please say something...</p>
                     <input name="topic" type="hidden" value="{{=it.topic._id}}"/>
                     <textarea name="says" placeholder="..." class="input-block-level" rows="3"></textarea>
                     <input type="hidden" name="action" id="action" value="">
@@ -140,7 +141,7 @@
         {{?? it.topic.next_actions[i].action == "Question" }}
           <a data-id="Question"  class="open-the-modal btn btn-warning btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Need more info</a>
         {{?? it.topic.next_actions[i].action == "Clarify" }}
-          <a data-id="Clarify"  class="open-the-modal btn btn-success btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Let me clarify that</a>
+          <a data-id="Clarify"  class="open-the-modal btn btn-warning btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Let me clarify that</a>
         {{?? it.topic.next_actions[i].action == "Accept" }}
           <a data-id="Accept"  class="open-the-modal btn btn-success btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Exactly</a>
         {{??}}
@@ -170,6 +171,17 @@
       $("#action").val( the_action );
       $("input#action").val( the_action );
       $("h3#myModalLabel").text( the_action );
+
+      if (the_action === "Restate") {
+        $("h3#myModalLabel").text( "Please restate the issue..." );
+        $("#popup_instructions").text(
+          "Great! You and your partner have identified the issue. Before we start working on resulution, let's "
+          +"take a moment to state the issue in your own words. This is extremely helpful both for you to make "
+          +"sure you have a solid grasp on the issue in your mind and for your partner to really feel that you "
+          +"got what they are talking about. This also gives us a final chance to make sure we're all on the same "
+          +"page");
+      }
+      
       $('#myModal2').modal('show');
       });
 
