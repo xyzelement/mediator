@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html>
 <head>
   <meta charset="utf-8">
   <title>Mediator</title>
@@ -79,31 +79,20 @@
 
   
   <div class="container-narrow">
-    <!-- <div style="height: 400px; overflow: auto;"> -->
 
-
-    <div id="accordion2">
       {{ for(var i in it.topic.arguments) { }}
 
 		<div class="well">
-			<div>
-				<div class="collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{=i}}">
-        
-
         <img src="{{=it.users[it.topic.arguments[i].by].pictureUrl}}" class="img-rounded pull-left" width="30">
         <strong class="pull-left"> &nbsp; {{=it.users[it.topic.arguments[i].by].displayName}} &nbsp; </strong> 
 
         {{=it.topic.arguments[i].text}}
-				</div>
-			</div>
-			<div id="collapse{{=i}}" class="collapse" style="height: 0px;">
-				<p class="text-info">
+
+        {{? it.topic.arguments.length - 1 == i}}
+        <p class="text-info">
             <br/>
             {{? it.topic.arguments[i].action === "Start"}}
-              A mediation has been initiated. Please read the issue carefully and decide if 
-              you understand it. If not, please ask for clarification. If yes, let's make sure 
-              everyone's on the same page so please restate your understanding of the issue in 
-              your own words.
+              Your mediation partner has initiated the discussion by describing the issue at hand.
             {{?? it.topic.arguments[i].action === "Question"}}
               Your mediation partner has requested a clarification about the issue. Please 
               answer their question. It's a good idea to explain it even if you feel you have 
@@ -119,12 +108,10 @@
               working on the resolution.
             {{??}} {{=it.topic.arguments[i].action}} {{?}}						 
 				</p>
-			</div>
-		</div>       
-     
-
+        {{?}}
+      </div>
       {{ } }}
-    </div>
+    
 
 
         <div id="myModal2" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -134,44 +121,32 @@
             </div>
             <div class="modal-body">
                 <form class="form-search" method="post" action="/add_comment">
-                    <input type="text" name="action" id="action" value=""/>
                     <input name="topic" type="hidden" value="{{=it.topic._id}}"/>
                     <textarea name="says" placeholder="..." class="input-block-level" rows="3"></textarea>
+                    <input type="hidden" name="action" id="action" value="">
+
                     <button type="submit" class="btn btn-primary btn-large">Submit</button>
                 </form>
             </div>
         </div>
 
-
-        <a data-id="Restate"  class="open-the-modal btn btn-success btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Makes Sense</a>
-        <a data-id="Question" class="open-the-modal btn btn-warning btn-large"><i class="icon-question-sign icon-white"></i>&nbsp;Need More Info</a>
-
-<!--</div>-->
-
-
-
-      <!--
-    <form class="form-search" method="post" action="/add_comment">
-
-      <legend>Response</legend>
-
-      <input name="topic" type="hidden" value="{{=it.topic._id}}"/>
-
       {{ for(var i in it.topic.next_actions) { }}
-      <label class="radio">
-      <input type="radio" name="action" id="{{=it.topic.next_actions[i].action}}" value="{{=it.topic.next_actions[i].action}}">
-      {{=it.topic.next_actions[i].text}}
-      </label>
-      </br>
+        {{? it.topic.next_actions[i].action == "Restate" }}
+          <a data-id="Restate"  class="open-the-modal btn btn-success btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Makes Sense</a>
+        {{?? it.topic.next_actions[i].action == "Question" }}
+          <a data-id="Question"  class="open-the-modal btn btn-warning btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Need more info</a>
+        {{?? it.topic.next_actions[i].action == "Clarify" }}
+          <a data-id="Clarify"  class="open-the-modal btn btn-danger btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Let me clarify that</a>
+        {{?? it.topic.next_actions[i].action == "Accept" }}
+          <a data-id="Accept"  class="open-the-modal btn btn-success btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Exactly</a>
+        {{??}}
+          what?
+        {{?}}
       {{ } }}
+      
+      
+</div>
 
-      <textarea name="says" placeholder="..." class="input-block-level" rows="3"></textarea>
-      <button type="submit" class="btn btn-info">Submit</button>
-
-
-    </form>
-          -->
-    <hr>
 
     <footer>
     <p>
@@ -179,10 +154,7 @@
     </p>
     </footer>
 
-  </div> <!-- /container -->
-  <!-- Le javascript
-  ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
+  </div>
   <script src="../assets/js/jquery.js">
   </script>
   <script src="../assets/js/bootstrap.js">
@@ -190,27 +162,14 @@
 
   <script type="text/javascript">
       $(document).on("click", ".open-the-modal", function () {
-      var myBookId = $(this).data('id');
-      $("#action").val( myBookId );
+      var the_action = $(this).data('id');
+      $("#action").val( the_action );
+      $("input#action").val( the_action );
+      $("h3#myModalLabel").text( the_action );
       $('#myModal2').modal('show');
       });
 
   </script>
 
-
-  <!--
-  <script src="../assets/js/bootstrap-transition.js"></script>
-  <script src="../assets/js/bootstrap-alert.js"></script>
-  <script src="../assets/js/bootstrap-modal.js"></script>
-  <script src="../assets/js/bootstrap-dropdown.js"></script>
-  <script src="../assets/js/bootstrap-scrollspy.js"></script>
-  <script src="../assets/js/bootstrap-tab.js"></script>
-  <script src="../assets/js/bootstrap-tooltip.js"></script>
-  <script src="../assets/js/bootstrap-popover.js"></script>
-  <script src="../assets/js/bootstrap-button.js"></script>
-  <script src="../assets/js/bootstrap-collapse.js"></script>
-  <script src="../assets/js/bootstrap-carousel.js"></script>
-  <script src="../assets/js/bootstrap-typeahead.js"></script>
-  -->
   </body>
 </html>
