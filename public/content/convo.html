@@ -103,6 +103,10 @@
               restated it in their own words. Please read through their take carefully - this 
               is your opportunity to ensure you're talking about the same thing. If they got 
               it perfectly, let them know. If not, explain to them what they are missing.
+            {{?? it.topic.arguments[i].action === "Clarify"}}
+              Your mediation partner has attempted to clarify things. We hope this helps, but
+              if not, please don't hesitate to ask for further clarification. This is our 
+              opportunity to make sure we're really on the same page about what the issue is.
             {{?? it.topic.arguments[i].action === "Accept"}}
               Awesome! You're on the same page about what the issue is. Now we can start 
               working on the resolution.
@@ -136,7 +140,7 @@
         {{?? it.topic.next_actions[i].action == "Question" }}
           <a data-id="Question"  class="open-the-modal btn btn-warning btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Need more info</a>
         {{?? it.topic.next_actions[i].action == "Clarify" }}
-          <a data-id="Clarify"  class="open-the-modal btn btn-danger btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Let me clarify that</a>
+          <a data-id="Clarify"  class="open-the-modal btn btn-success btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Let me clarify that</a>
         {{?? it.topic.next_actions[i].action == "Accept" }}
           <a data-id="Accept"  class="open-the-modal btn btn-success btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Exactly</a>
         {{??}}
