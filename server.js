@@ -104,7 +104,7 @@ app.get('/read', ensureAuthenticated, function (req, res) {
       var obj = {   topic:          req.query["topic"],
                       topic :       topic,
                       user_id:      req.user.id,
-                      users:        users         };
+                      users:        users     };
 
       res.end(templates.convo_page(obj)); 
     });
