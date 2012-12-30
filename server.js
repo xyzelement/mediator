@@ -101,10 +101,11 @@ app.get('/read', ensureAuthenticated, function (req, res) {
 
     user_cache.create_user_data(req.user.token, user_ids, {} , function(users) { 
 
-      var obj = {   topic:          req.query["topic"],
+      var obj = {     topic:        req.query["topic"],
                       topic :       topic,
                       user_id:      req.user.id,
-                      users:        users     };
+                      users:        users,
+                      whatever:     mediations.whatever};
 
       res.end(templates.convo_page(obj)); 
     });

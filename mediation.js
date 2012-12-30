@@ -17,7 +17,24 @@ p.status_from_action = function(action) {
   case "Clarify"  : return "Alleged";
   case "Accept"   : return "Accepted";
   }
+}
 
+module.exports.whatever = {
+  "Start" :    { "Recap"   : "started a mediation",
+                 "Button"  : "You should never see this button!",
+                 "Command" : "You should never see this info!"},
+  "Restate" :  { "Recap"   : "restated the issue in their own words",
+                 "Button"  : "I think I understand",
+                 "Command" : "In order to make sure you are talking about the same thing, please restate the issue in your own words." },
+  "Question" : { "Recap"   : "requested more information",
+                 "Button"  : "I need to know more",
+                 "Command" : "It's great that you need more information. Please be as specific as possible about what you require." },
+  "Clarify" :  { "Recap"   : "provided more information",
+                 "Button"  : "Let me clarify",
+                 "Command" : "Please provide a clarification here. This is a great opportunity to make sure everone's on the same page." },
+  "Accept" :   { "Recap"   : "agrees with the restatement of the issue",
+                 "Button"  : "Exactly",
+                 "Command" : "It's great that we're on the same page! State it and let's move on to resolution." },
 }
 
 p.set_status = function (status) {

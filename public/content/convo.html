@@ -80,41 +80,18 @@
   
   <div class="container-narrow">
 
-      {{ for(var i in it.topic.arguments) { }}
+    {{ for(var i in it.topic.arguments) { }}
 
-		<div class="well">
+      <div class="well well-small">
         <img src="{{=it.users[it.topic.arguments[i].by].pictureUrl}}" class="img-rounded pull-left" width="30">
-        <strong class="pull-left"> &nbsp; {{=it.users[it.topic.arguments[i].by].displayName}} &nbsp; </strong> 
+        <strong class="pull-left"> &nbsp; {{=it.users[it.topic.arguments[i].by].displayName}}&nbsp;</strong> 
+        <span class="sstext-info">{{=it.whatever[it.topic.arguments[i].action]["Recap"]}}</span>: <br/><br/>
 
-        {{=it.topic.arguments[i].text}}
-
-        {{? it.topic.arguments.length - 1 == i}}
-        <p class="text-info">
-            <br/>
-            {{? it.topic.arguments[i].action === "Start"}}
-              Your mediation partner has initiated the discussion by describing the issue at hand.
-            {{?? it.topic.arguments[i].action === "Question"}}
-              Your mediation partner has requested a clarification about the issue. Please 
-              answer their question. It's a good idea to explain it even if you feel you have 
-              already explained this point or it should be obvious. This is a very important 
-              step to ensure you're not talking past each other.
-            {{?? it.topic.arguments[i].action === "Restate"}}
-              Your mediation partner indicated that they understood the issue, and they have 
-              restated it in their own words. Please read through their take carefully - this 
-              is your opportunity to ensure you're talking about the same thing. If they got 
-              it perfectly, let them know. If not, explain to them what they are missing.
-            {{?? it.topic.arguments[i].action === "Clarify"}}
-              Your mediation partner has attempted to clarify things. We hope this helps, but
-              if not, please don't hesitate to ask for further clarification. This is our 
-              opportunity to make sure we're really on the same page about what the issue is.
-            {{?? it.topic.arguments[i].action === "Accept"}}
-              Awesome! You're on the same page about what the issue is. Now we can start 
-              working on the resolution.
-            {{??}} {{=it.topic.arguments[i].action}} {{?}}						 
-				</p>
-        {{?}}
+        <blockquote class="lead">
+          {{=it.topic.arguments[i].text}}        
+        </blockquote>
       </div>
-      {{ } }}
+    {{ } }}
     
 
 
@@ -136,20 +113,15 @@
         </div>
 
       {{ for(var i in it.topic.next_actions) { }}
-        {{? it.topic.next_actions[i].action == "Restate" }}
-          <a data-id="Restate"  class="open-the-modal btn btn-success btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Makes Sense</a>
-        {{?? it.topic.next_actions[i].action == "Question" }}
-          <a data-id="Question"  class="open-the-modal btn btn-warning btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Need more info</a>
-        {{?? it.topic.next_actions[i].action == "Clarify" }}
-          <a data-id="Clarify"  class="open-the-modal btn btn-warning btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Let me clarify that</a>
-        {{?? it.topic.next_actions[i].action == "Accept" }}
-          <a data-id="Accept"  class="open-the-modal btn btn-success btn-large"><i class="icon-ok-circle icon-white"></i>&nbsp;Exactly</a>
-        {{??}}
-          what?
-        {{?}}
-      {{ } }}
-      
-      
+        <a data-id="{{=it.topic.next_actions[i].action}}"
+           data-button="{{=it.whatever[it.topic.next_actions[i].action]["Button"]}}"  
+           data-command="{{=it.whatever[it.topic.next_actions[i].action]["Command"]}}"  
+           class="open-the-modal btn btn-success btn-large">
+           <i class="icon-ok-circle icon-white"></i>
+           &nbsp;{{=it.whatever[it.topic.next_actions[i].action]["Button"]}}
+        </a>
+
+      {{ } }}   
 </div>
 
 
@@ -160,30 +132,22 @@
     </footer>
 
   </div>
-  <script src="../assets/js/jquery.js">
-  </script>
-  <script src="../assets/js/bootstrap.js">
-  </script>
+  
+  <script src="../assets/js/jquery.js"></script>
+  <script src="../assets/js/bootstrap.js"></script>
 
   <script type="text/javascript">
       $(document).on("click", ".open-the-modal", function () {
-      var the_action = $(this).data('id');
-      $("#action").val( the_action );
-      $("input#action").val( the_action );
-      $("h3#myModalLabel").text( the_action );
+        var the_action = $(this).data('id');
+        $("#action").val( the_action );
+        $("input#action").val( the_action );
+        $("h3#myModalLabel").text( $(this).data('button') );
 
-      if (the_action === "Restate") {
-        $("h3#myModalLabel").text( "Please restate the issue..." );
-        $("#popup_instructions").text(
-          "Great! You and your partner have identified the issue. Before we start working on resulution, let's "
-          +"take a moment to state the issue in your own words. This is extremely helpful both for you to make "
-          +"sure you have a solid grasp on the issue in your mind and for your partner to really feel that you "
-          +"got what they are talking about. This also gives us a final chance to make sure we're all on the same "
-          +"page");
-      }
-      
-      $('#myModal2').modal('show');
+        $("#popup_instructions").text(  $(this).data('command')  );
+        
+        $('#myModal2').modal('show');
       });
+      $('html, body').animate({scrollTop:$(document).height()}, 'slow');
 
   </script>
 
