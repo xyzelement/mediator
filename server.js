@@ -83,13 +83,13 @@ app.post('/start', ensureAuthenticated, function (req, res) {
   var m = new mediations.Mediation();
   m.from = req.user.id;
   m.to   = req.body.with;
-  m.subject = req.body.says;
+  m.subject = req.body.summary;
 
-  m.add(req.user.id, "Start", req.body.says);
+  m.add(req.user.id, "Start", req.body.details);
   m.save();
 
   //EMTODO: put this in callback?
-  res.redirect( facebook.get_fb_invite_url(req.body.with, req.body.says, null) ); 
+  res.redirect( facebook.get_fb_invite_url(req.body.with, req.body.summary, null) ); 
 });
 
 

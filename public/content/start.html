@@ -106,15 +106,14 @@
   
         <div class="hero-unit">
         <form class="form-horizontal" method="post" action="/start">
-          <div class="control-group">
-              <legend>Start an argument</legend>
-          </div>
           <input type="hidden" name="with" value="{{=it.target_id}}">
           <div class="control-group">  
-            <textarea name="says" placeholder="..." class="input-block-level" rows=10></textarea>
+
+            <input name="summary" type="text" placeholder="Summary of the issue" class="input-block-level" maxlength="100" /> <br/><br/>
+            <textarea name="details" placeholder="Detials of the issue" class="input-block-level" rows=10></textarea>
           </div>
           <div class="control-group">  
-            <button type="submit" class="btn btn-info">Submit</button>
+            <button type="submit" class="btn btn-info">Start the Mediation</button>
           </div>
         </form>
         </div>
