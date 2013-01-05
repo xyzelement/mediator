@@ -106,13 +106,13 @@
   
         <div class="hero-unit">
         <!-- http://docs.jquery.com/Plugins/Validation#Validate_forms_like_you.27ve_never_been_validating_before.21 -->
-        <form class="form-horizontal cmxform" method="post" action="/start" id="commentForm">
+        <form class="form-horizontal cmxform" method="post" action="/start" id="startForm">
           <input type="hidden" name="with" value="{{=it.target_id}}">
           <div class="control-group">  
 
-            <input name="summary" type="text" placeholder="Summary of the issue" class="input-block-level required" maxlength="100" /> 
-              <br/><br/>
-            <textarea name="details" placeholder="Detials of the issue" class="input-block-level required" rows=10></textarea>
+            <input name="summary" type="text" placeholder="Summary of the issue" class="input-block-level" maxlength="100" /> 
+
+            <textarea name="details" placeholder="Detials of the issue" class="input-block-level" rows=10></textarea>
           </div>
           <div class="control-group">  
             <button type="submit" class="btn btn-info">Start the Mediation</button>
@@ -143,7 +143,13 @@
 
   <script>
   $(document).ready(function(){
-    $("#commentForm").validate();
+    $("#startForm").validate({
+      errorClass: "text-error",
+      rules:    { summary: {required: true},
+                  details: {required: true}                  },
+      messages: { summary: "<i class='icon-hand-up'></i>Please enter a high level description of the issue.",
+                  details: "<i class='icon-hand-up'></i>Please enter the details of the issue."}
+    });
   });
   </script>
 
