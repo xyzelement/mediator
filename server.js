@@ -137,6 +137,7 @@ app.get('/debug', function(req,res) {
 
 app.get('/remove', /*ensureAuthenticated,*/ function (req, res) {
   conf.db.mediations.remove();
+  conf.db.users.remove();
   res.redirect('/');
 });
 

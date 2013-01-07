@@ -75,8 +75,25 @@ app.get('/fbcb',
   function(req, res) {
     conf.log("LogIn: " + util.inspect(req.user.username 
                          + " " + req.user.id + " " + req.user.profileUrl));
-    conf.db.users.save({fb_id: req.user.id, data: req.user});
-    res.redirect('/');
+                         
+    conf.db.users.findOne({f_id: req.user.id}, function (err, user) {
+      if (err || !user) {
+      
+      /*var obj = {     topic:        req.query["topic"],
+                      topic :       topic,
+                      user_id:      req.user.id,
+                      users:        users,
+                      whatever:     mediations.whatever};
+
+      res.end(templates.convo_page(obj)); */
+      
+      
+      
+        res.redirect('/content/signup.html');        
+      } else {
+        res.redirect('/');
+      }
+    });
 });
 
 
