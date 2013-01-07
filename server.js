@@ -54,6 +54,14 @@ app.get('/user', ensureAuthenticated, function (req, res) {
 });
 
 
+app.get('/signup', function (req, res) {
+  res.end(templates.signup_page({ 
+    user: { facebook_id: 12345,
+            name: "Ed Hard Coded"
+          }
+  })) 
+});
+
 app.get('/start', ensureAuthenticated, function (req, res) {
   var w = req.query["with"];
   console.log("* /start(g) " + w);

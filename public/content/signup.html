@@ -64,11 +64,17 @@
       <!-- Main hero unit for a primary marketing message or call to action -->
       <!-- <div class="hero-unit"> -->
         
-      <h1>Signup Information</h1>
-        
-      ID:   {= it.user.facebook_id}}
-      Name: {{= it.user.name}}
+      <h1>Welcome</h1>
+       
 
+      <form action="/add_user" method="post">
+        Facebook ID <input type="text" name="facebook_id"   value="{{= it.user.facebook_id}} "></input> </br>
+        Name:       <input type="text" name="name"          value="{{= it.user.name}} ">       </input></br>
+        <hr/>
+        Email:      <input type="text" name="email"         value="{{= it.user.email}} ">       </input></br>
+        Password:   <input type="password" name="password"  value="">       </input></br>
+        <input type="submit" value="Sign Up"/>
+      </form>
 	
       <hr>
 

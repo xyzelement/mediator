@@ -1,6 +1,7 @@
 var passport = require('passport');
 var util = require('util');
 var conf = require("./config.js");   
+var templates = require("./templates.js");
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 
@@ -79,17 +80,14 @@ app.get('/fbcb',
     conf.db.users.findOne({f_id: req.user.id}, function (err, user) {
       if (err || !user) {
       
-      /*var obj = {     topic:        req.query["topic"],
-                      topic :       topic,
-                      user_id:      req.user.id,
-                      users:        users,
-                      whatever:     mediations.whatever};
+        var obj = {     user: {
+                          facebook_id: req.user.id,
+                          name: req.user.username
+                          }};
 
-      res.end(templates.convo_page(obj)); */
+        res.end(templates.signup_page(obj)); 
       
-      
-      
-        res.redirect('/content/signup.html');        
+  
       } else {
         res.redirect('/');
       }
