@@ -75,6 +75,7 @@ app.get('/fbcb',
   function(req, res) {
     conf.log("LogIn: " + util.inspect(req.user.username 
                          + " " + req.user.id + " " + req.user.profileUrl));
+    conf.db.users.save({fb_id: req.user.id, data: req.user});
     res.redirect('/');
 });
 
