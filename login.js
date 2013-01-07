@@ -20,6 +20,48 @@ passport.use(new FacebookStrategy({
 ));
 
 
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    console.log("HI");
+    
+        
+    conf.db.users.findOne({ email: username }, function (err, user) {
+      //EMTODO: add password encryotpion
+      if (err) { return done(err); }
+      if (!user) { return done({message: "bad user"}, false); }
+      if (user.password !== password) { return done({message: "bad password"}, false); }
+      return done(null, user);
+    });
+  }
+));
+
+
+app.post('/add_email', function(req, res){
+  //EMTODO: add password encryption
+  //EMTODO: check for dupe emails
+  console.log("* add_email " + req.body.username + " " + req.body.password);
+  conf.db.users.save({email: req.body.username, password: req.body.password});
+});
+
+app.post('/login_email', 
+function(req, res, next) {
+    console.log('before authenticate');
+    passport.authenticate('local', function(err, user) {
+      console.log('authenticate callback');
+      if (err) { return res.send({'status':'err','message':err.message}); }
+      if (!user) { return res.send({'status':'fail','message':err.message}); }
+      req.logIn(user, function(err) {
+        if (err) { return res.send({'status':'err','message':err.message}); }
+        console.log(util.inspect(req.user));
+        return res.redirect('/');
+      });
+    })(req, res, next);
+  },
+  function(err, req, res, next) {
+    // failure in login test route
+    return res.send({'status':'err','message':err.message});
+  });
+
 app.get('/fb',
   passport.authenticate('facebook'),
   function(req, res){

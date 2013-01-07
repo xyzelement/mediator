@@ -5,7 +5,7 @@ exports.CALLBACK_URL        = process.env.CALLBACK_URL;
 exports.MY_URL              = process.env.MY_URL;
 exports.LOGGLY_ID           = process.env.LOGGLY_ID;
 
-exports.db = require('mongojs').connect("mongodb://localhost:27017/mydb", ['mediations']);
+exports.db = require('mongojs').connect("mongodb://localhost:27017/mydb", ['mediations', 'users']);
 
 var loggly = require('loggly');
 var util   = require('util');

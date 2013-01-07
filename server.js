@@ -130,7 +130,7 @@ app.post('/add_comment', ensureAuthenticated, function (req, res) {
 
 
 app.get('/debug', function(req,res) { 
-  conf.db.mediations.find( {}, function (err, out) { 
+  conf.db.users.find( {}, function (err, out) { 
       console.log(out);
       res.end( util.inspect(out) ); }); 
 });
