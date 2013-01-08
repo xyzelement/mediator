@@ -37,11 +37,20 @@ passport.use(new LocalStrategy(
 ));
 
 
-app.post('/add_email', function(req, res){
+app.post('/add_user', function(req, res){
   //EMTODO: add password encryption
   //EMTODO: check for dupe emails
-  console.log("* add_email " + req.body.username + " " + req.body.password);
-  conf.db.users.save({email: req.body.username, password: req.body.password});
+  
+  var user = {
+    facebook_id: req.body.facebook_id,
+    username:    req.body.username,
+    email:       req.body.email,
+    password:    req.body.password
+  };
+  
+  console.log("* add_user " + util.inspect(user));
+  conf.db.users.save(user);
+  res.redirect("/user");
 });
 
 app.post('/login_email', 
@@ -77,8 +86,12 @@ app.get('/fbcb',
     conf.log("LogIn: " + util.inspect(req.user.username 
                          + " " + req.user.id + " " + req.user.profileUrl));
                          
-    conf.db.users.findOne({f_id: req.user.id}, function (err, user) {
+    console.log("looking for " + util.inspect({facebook_id: req.user.id}));
+    
+    conf.db.users.findOne({facebook_id: req.user.id}, function (err, user) {
       if (err || !user) {
+      
+        console.log("whatever: " + err + user);
       
         var obj = {     user: {
                           facebook_id: req.user.id,
