@@ -64,16 +64,29 @@
       <!-- Main hero unit for a primary marketing message or call to action -->
       <!-- <div class="hero-unit"> -->
         
-      <h1>Welcome</h1>
+      <h1>Welcome, {{= it.user.display_name}} <img src="{{= it.user.getPictureUrl() }}"/></h1>
        
+      <form action="/update_account" method="post" class="form-horizontal" id="accountForm">
+        <!-- <input type="hidden" name="facebook_id"   value="{{= it.user.facebook_id}}"></input> -->
+        <div class="control-group">
+          <label class="control-label">Name</label>       
+          <div class="controls">
+            <input type="text" name="display_name" value="{{= it.user.display_name}}"></input>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <label class="control-label">Email</label>       
+          <div class="controls">        
+            <input type="text" name="email" value="{{? it.user.email}}{{= it.user.email}}{{?}}"> </input>
+          </div>
+        </div>
 
-      <form action="/add_user" method="post">
-        Facebook ID <input type="text" name="facebook_id"   value="{{= it.user.facebook_id}}"></input> </br>
-        Name:       <input type="text" name="username"      value="{{= it.user.name}}">       </input></br>
-        <hr/>
-        Email:      <input type="text" name="email"         value="{{= it.user.email}}">       </input></br>
-        Password:   <input type="password" name="password"  value="">       </input></br>
-        <input type="submit" value="Sign Up"/>
+        <div class="control-group">
+          <div class="controls">  
+            <input type="submit" value="Update" class="btn" />
+          </div>
+        </div>
       </form>
 	
       <hr>
@@ -90,5 +103,21 @@
     <script src="../assets/js/jquery.js"></script>
     <script src="../assets/js/bootstrap.js"></script>
 
+    <!-- EMTODO: download this file locally -->
+    <script type="text/javascript" src="http://jzaefferer.github.com/jquery-validation/jquery.validate.js"></script>
+    
+    
+  <script>
+  $(document).ready(function(){
+    $("#accountForm").validate({
+      errorClass: "text-error",
+      rules:    { display_name: {required: true},
+                  email: {required: true, email: true}                  },
+      messages: { display_name: "<i class='icon-hand-up'></i>How will your name appear on the site?",
+                  email: "<i class='icon-hand-up'></i>How do we notify you?"}
+    });
+  });
+  </script>    
+    
   </body>
 </html>

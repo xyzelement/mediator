@@ -3,7 +3,7 @@ var doT = require('dot')
 var convo_template = "";
 var user_template = "";
 var start_template = "";
-var signup_template = "";
+var account_template = "";
 
 var fs = require('fs');
 
@@ -23,9 +23,9 @@ fs.readFile(__dirname + '/public/content/start.html', function (err, data) {
 });
 
 
-  fs.readFile(__dirname + '/public/content/signup.html', function (err, data) {
+  fs.readFile(__dirname + '/public/content/account.html', function (err, data) {
   	if (err) { throw err; }
-  	signup_template = doT.template(data.toString());
+  	account_template = doT.template(data.toString());
   });
 
 exports.user_page  = function(user){ return user_template(user);  }
@@ -48,10 +48,12 @@ exports.convo_page = function(user){
   return convo_template(user); 
 }
 
-exports.signup_page = function(user){ 
-  fs.readFile(__dirname + '/public/content/signup.html', function (err, data) {
+
+
+exports.account_page = function(user){ 
+  fs.readFile(__dirname + '/public/content/account.html', function (err, data) {
   	if (err) { throw err; }
-  	signup_template = doT.template(data.toString());
+  	account_template = doT.template(data.toString());
   });
-  return signup_template(user); 
+  return account_template(user); 
 }

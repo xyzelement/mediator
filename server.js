@@ -21,10 +21,25 @@ app.use(app.router);
 app.use(express.static(__dirname + '/public'));
 
 var login = require("./login");
+var user = require("./refactor_user");
 
 function ensureAuthenticated(req, res, next) {
-	if (req.isAuthenticated()) { return next(); }
-	res.redirect('/content/login.html')
+	if (req.isAuthenticated()) { 
+    user.User.findOne({facebook_id: req.user.id}, function(err, usr) {
+      if (err || !usr) {
+        //EMTODO: crash here for now. what else can we do
+        console.log("EMTODO: user not in DB?");
+      }
+      
+      if (usr.needsMoreInfo()) {
+        res.end(templates.account_page({  user         : usr  }));
+      } else {       
+        return next(); 
+      }
+    });
+  } else {
+    res.redirect('/content/login.html')
+  }
 }
 
 
@@ -43,6 +58,8 @@ app.get('/user', ensureAuthenticated, function (req, res) {
       user_ids.push( meds[i].to   );
     }
 
+    
+    
     user_cache.create_user_data(req.user.token, user_ids, {} ,function(users) { 
       res.end(templates.user_page({ 
         user_id      : req.user.id,
@@ -120,6 +137,29 @@ app.get('/read', ensureAuthenticated, function (req, res) {
   });
 });
 
+app.get('/account', ensureAuthenticated, function(req, res) {
+ user.User.findOne({facebook_id: req.user.id}, function(err, usr) {
+      if (err || !usr) {
+        //EMTODO: crash here for now. what else can we do
+        console.log("EMTODO: user not in DB?");
+      }
+      
+      res.end(templates.account_page({  user         : usr  }));
+  }); 
+});
+
+//EMTODO: not authenticating here because that causes an infinite loop
+//EMTODO: need 2 versions of ensureAuthenticated, one that checks
+//        the database and one that does not!!!!
+app.post('/update_account', /*ensureAuthenticated,*/ function (req, res) {
+  console.log("Update account, looking for: " + req.user.id);
+  user.User.findOneAndUpdate({facebook_id: req.user.id}, 
+                             {display_name: req.body.display_name, email: req.body.email},
+                             function (err, usr) {
+                              console.log("Updated: " + err + " " + usr); 
+                              res.redirect('/account');
+                             });
+});
 
 app.post('/add_comment', ensureAuthenticated, function (req, res) {
   console.log("* /add_comment " + req.body.topic + " " + req.user.id + " " + req.body.says + " " + req.body.action);
