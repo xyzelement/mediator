@@ -86,14 +86,12 @@
     {{ for(i=0; i < it.mediation.comments.length; ++i) { }}
       
       <div class="well well-small">
-      [[{{=i}}]]
-        <img src="{{=it.user_id}}" class="img-rounded pull-left" width="30">
-        <strong class="pull-left"> &nbsp; {{=it.user_id}}&nbsp;</strong> 
-        
+        <img src="{{=it.mediation.comments[i].user.getPictureUrl()}}" 
+          class="img-rounded pull-left" width="30">
+        <strong class="pull-left"> &nbsp; {{=it.mediation.comments[i].user.display_name}}&nbsp;</strong> 
 
-        <blockquote class="lead">
-          {{=it.mediation.comments[i].text}}        
-        </blockquote>
+        {{=it.mediation.comments[i].text}}        
+
       </div>
     {{ } }}
     

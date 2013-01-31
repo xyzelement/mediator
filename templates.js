@@ -28,7 +28,13 @@ fs.readFile(__dirname + '/public/content/start.html', function (err, data) {
   	account_template = doT.template(data.toString());
   });
 
-exports.user_page  = function(user){ return user_template(user);  }
+exports.user_page  = function(user){ 
+  fs.readFile(__dirname + '/public/content/user.html', function (err, data) {
+  	if (err) { throw err; }
+  	user_template = doT.template(data.toString());
+  });
+  return user_template(user); 
+}
 
 exports.start_page = function(user){ 
   fs.readFile(__dirname + '/public/content/start.html', function (err, data) {

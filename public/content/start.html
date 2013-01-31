@@ -68,22 +68,22 @@
         <legend>Start an argument with:</legend>
         
           {{ for (i=0; i < it.users.length; ++i) { }}
-            <li><a href="/start?with={{=it.users[i]._id}}">
+            <li><a href="/start_with?with={{=it.users[i]._id}}">
               {{=it.users[i].display_name}} {{=it.users[i].email}} {{=it.users[i].facebook_id}} 
             </a></li>
           {{ } }}
 
       {{??}}
         <h3>
-          <img src="{{=it.user_id}}" /> {{=it.user_id}}
+          <img src="{{=it.creator.getPictureUrl()}}" /> {{=it.creator.display_name}}
           vs.
-          <img src="{{=it.target_id}}" /> {{=it.target_id}}
+          <img src="{{=it.target.getPictureUrl()}}" /> {{=it.target.display_name}}
         </h3>
   
         <div class="hero-unit">
         <!-- http://docs.jquery.com/Plugins/Validation#Validate_forms_like_you.27ve_never_been_validating_before.21 -->
         <form class="form-horizontal cmxform" method="post" action="/start" id="startForm">
-          <input type="hidden" name="with" value="{{=it.target_id}}">
+          <input type="hidden" name="with" value="{{=it.target._id}}">
           <div class="control-group">  
 
             <input name="summary" type="text" placeholder="Summary of the issue" class="input-block-level" maxlength="100" /> 

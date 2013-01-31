@@ -78,18 +78,26 @@ app.post('/update_account', /*ensureAuthenticated,*/ function (req, res) {
 });
 
 
+app.get('/start_with', ensureAuthenticated, function (req, res) {
+  var w = req.query["with"];
+  console.log("* /start with " + w);
+  
+  user.User.findById(req.session.user_id, function (err, creator) {
+    if (err) console.log("Error finding user", req.session.user_id);
+    user.User.findById(w, function (err, target) {
+      if (err) console.log("Error finding user", w);
+      res.end(templates.start_page({   creator:     creator,
+                                       target:      target }));    
+    })
+  })
+})
+
 
 app.get('/start', ensureAuthenticated, function (req, res) {
-  var w = req.query["with"];
-  console.log("* /start(g) " + w);
-  if (!w) {
-    user.User.find({}, function(err, usrs) {
+  console.log("* /start(g) ");
+  user.User.find({}, function(err, usrs) {
          res.end(templates.start_page({ users: usrs }))    
-    });
-  } else {
-    res.end(templates.start_page({ user_id:     req.session.user_id,
-                                   target_id:   w }));  
-  }
+  });
 });
 
 
@@ -101,9 +109,9 @@ app.get('/debug', function(req,res) {
 });
 
 app.get('/remove', /*ensureAuthenticated,*/ function (req, res) {
-  req.logout();
+  //req.logout();
   conf.connection.collections.mediations.drop();
-  conf.connection.collections.users.drop();
+  //conf.connection.collections.users.drop();
   res.redirect('/');
 });
 

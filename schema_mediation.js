@@ -71,6 +71,14 @@ exports.findMediationsForUser = function(user, cb) {
   .exec(cb);
 }
 
+exports.findMediationById = function(id, cb) {
+  exports.Mediation.findById(id)
+  .populate('_creator')
+  .populate('defendent_id')
+  .populate('comments.user')
+  .exec(cb);
+}
+
 exports.addCommentById = function (mediation_id, user_id, text, action, cb) {
 
   var comment = new exports.Comment({  user:   user_id,
