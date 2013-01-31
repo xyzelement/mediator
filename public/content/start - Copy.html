@@ -64,20 +64,44 @@
       <!-- Main hero unit for a primary marketing message or call to action -->
       <!-- <div class="hero-unit"> -->
 
-      {{? it.users }} 
+      {{? it.friends }} 
         <legend>Start an argument with:</legend>
         
-          {{ for (i=0; i < it.users.length; ++i) { }}
-            <li><a href="/start?with={{=it.users[i]._id}}">
-              {{=it.users[i].display_name}} {{=it.users[i].email}} {{=it.users[i].facebook_id}} 
-            </a></li>
-          {{ } }}
+        
+            <div class="tabbable tabs-top">
+              <ul class="nav nav-tabs">
+                {{ for(var letter in it.friends) { }}          
+                  <li><a href="#{{=it.friends[letter][0].name.substring(0,1)}}" data-toggle="tab">{{=it.friends[letter][0].name.substring(0,1)}}</a></li>
+                {{ } }}
+              </ul>
+              <div class="tab-content">
+               {{ for(var letter in it.friends) { }}
+                <div class="tab-pane active" id="{{=it.friends[letter][0].name.substring(0,1)}}">
+                <ul>
+                  {{ for(var friend in it.friends[letter]) { }}
+                  <li>
+                    <a href="/start?with={{=it.friends[letter][friend].id}}">
+                      <!-- <img src="https://graph.facebook.com/{{=it.friends[letter][friend].id}}/picture" /> -->
+                      {{=it.friends[letter][friend].name}}
+                    </a>
+                  </li>
+                  {{ } }}
+                </ul>
+                </div>
+              {{ } }}
+
+              </div>
+            </div> <!-- /tabbable -->        
+        
+        
+        
+        
 
       {{??}}
         <h3>
-          <img src="{{=it.user_id}}" /> {{=it.user_id}}
+          <img src="{{=it.users[it.user_id].pictureUrl}}" /> {{=it.users[it.user_id].displayName}}
           vs.
-          <img src="{{=it.target_id}}" /> {{=it.target_id}}
+          <img src="{{=it.users[it.target_id].pictureUrl}}" /> {{=it.users[it.target_id].displayName}}
         </h3>
   
         <div class="hero-unit">

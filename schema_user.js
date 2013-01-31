@@ -1,11 +1,14 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test'); //EMTODO: standardize db access?
+var util = require("util");
 
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback () {
+
+
+
+
+exports.addSchema = function () {
   
 
+  // USER
   var userSchema = mongoose.Schema({
     facebook_id:  {type: String, unique: true},
     display_name: String,
@@ -19,6 +22,20 @@ db.once('open', function callback () {
   userSchema.methods.needsMoreInfo = function () {
     return this.email == undefined;
   }
+  
+  userSchema.methods.toString = function () {
+    return this.display_name + " (" + this.facebook_id + ") "//+ (this.email ? this.email : "");
+  }
 
+  userSchema.methods.sameUser = function(usr) { //EMTODO: is this the right way to compare?
+    return this._id === usr._id;
+  }
+  
   exports.User = mongoose.model('User', userSchema);
-});
+}
+
+
+
+
+
+

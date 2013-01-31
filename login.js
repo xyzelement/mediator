@@ -3,7 +3,7 @@ var util = require('util');
 var conf = require("./config.js");   
 var templates = require("./templates.js");
 var FacebookStrategy = require('passport-facebook').Strategy;
-var user = require("./refactor_user");
+var user = require("./schema_user");
 
 passport.serializeUser(function(user, done)  { done(null, user); });
 passport.deserializeUser(function(obj, done) { done(null, obj);  });
