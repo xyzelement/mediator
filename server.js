@@ -34,6 +34,7 @@ function ensureAuthenticated(req, res, next) {
       if (usr.needsMoreInfo()) {
         res.end(templates.account_page({  user         : usr  }));
       } else {       
+        req.session.user_id = usr._id;
         return next(); 
       }
     });
@@ -49,28 +50,20 @@ app.get('/', ensureAuthenticated, function (req, res) {
 
 
 app.get('/user', ensureAuthenticated, function (req, res) {
-  console.log("* /user " + req.user.id);
+  console.log("* /user " + req.user.id)
   
-  mediations.list(req.user.id, function(meds) {  
-    user_ids = [req.user.id];
-    for (i=0; i<meds.length; ++i) {
-      user_ids.push( meds[i].from );
-      user_ids.push( meds[i].to   );
-    }
-
-    
-    
-    user_cache.create_user_data(req.user.token, user_ids, {} ,function(users) { 
+  user.findMediationsForUser(req.session.user_id, function(err, mediations) {
+      if(err) console.log("ERROR loading topics");
+  
       res.end(templates.user_page({ 
-        user_id      : req.user.id,
-        topics       : meds,
+        user         : req.session.user_id,
+        topics       : mediations,
         alert        : req.query["alert"],
-        users        : users }));
-    });
+        }));  
   });
 });
 
-
+/*
 app.get('/signup', function (req, res) {
   res.end(templates.signup_page({ 
     user: { facebook_id: 12345,
@@ -78,6 +71,7 @@ app.get('/signup', function (req, res) {
           }
   })) 
 });
+*/
 
 app.get('/start', ensureAuthenticated, function (req, res) {
   var w = req.query["with"];
@@ -103,38 +97,41 @@ app.get('/start', ensureAuthenticated, function (req, res) {
 
 
 app.post('/start', ensureAuthenticated, function (req, res) {
-  console.log("* /start(p) " + req.user.id + " " + req.body.with + " " + req.body.says);
+  console.log("* /start(p) " + req.user.id + " " + req.body.with + " " + req.body.sumary);
 
-  var m = new mediations.Mediation();
-  m.from = req.user.id;
-  m.to   = req.body.with;
-  m.subject = req.body.summary;
+  var med =  new user.Mediation({ _creator:       req.session.user_id,
+                                  topic:          req.body.summary,
+                                  defendent_id:   req.session.user_id,  //EMTODO: for now  
+                                });
+                                
+  med.addComment( new user.Comment({ user:   req.session.user_id,
+                                     text:   req.body.details,
+                                     action: "Start" })  );
 
-  m.add(req.user.id, "Start", req.body.details);
-  m.save();
+  med.save( function (err, meds) { 
+    if (err) console.log("Error Saving", err, meds); 
+    res.redirect("/user");
+    //EMTODO: res.redirect( facebook.get_fb_invite_url(req.body.with, req.body.summary, null) ); 
+  });
+  
+  
 
-  //EMTODO: put this in callback?
-  res.redirect( facebook.get_fb_invite_url(req.body.with, req.body.summary, null) ); 
+  
 });
 
 
 app.get('/read', ensureAuthenticated, function (req, res) {
   console.log("* /read " + req.query["topic"]);
   
-  mediations.load(req.query["topic"], function(topic) { 
-    user_ids  = [topic.from, topic.to]; //make sure to always have our own user object
+  user.Mediation.findById(req.query["topic"], function (err, med) {
+    console.log(err, med);
+    var obj = {     user_id:      req.user.id,
+                  mediation:      med
+              };
 
-    user_cache.create_user_data(req.user.token, user_ids, {} , function(users) { 
-
-      var obj = {     topic:        req.query["topic"],
-                      topic :       topic,
-                      user_id:      req.user.id,
-                      users:        users,
-                      whatever:     mediations.whatever};
-
-      res.end(templates.convo_page(obj)); 
-    });
+    res.end(templates.convo_page(obj));    
   });
+  
 });
 
 app.get('/account', ensureAuthenticated, function(req, res) {
@@ -164,16 +161,16 @@ app.post('/update_account', /*ensureAuthenticated,*/ function (req, res) {
 app.post('/add_comment', ensureAuthenticated, function (req, res) {
   console.log("* /add_comment " + req.body.topic + " " + req.user.id + " " + req.body.says + " " + req.body.action);
 
-  mediations.load(req.body.topic, function(topic) {
-    topic.add(req.user.id, req.body.action, req.body.says);
-    topic.save();
-  });
- 
-  //EMTODO: this should be more targeted!
-  io.sockets.emit('refresh', { hello: 'world' });
-   
-  //EMTODO: put this in callback? 
-  res.redirect('/read?topic='+req.body.topic);
+  var comment = new user.Comment({  user:   req.session.user_id,
+                                    text:   req.body.says,
+                                    action: req.body.action         });
+  
+  user.Mediation.findByIdAndUpdate(req.body.topic, { $push: { comments: comment }}, function(err,med) {
+    console.log("Added comment: ", err, med);
+    res.redirect('/read?topic='+req.body.topic);
+    //EMTODO: notify via web socket
+  });;
+
 });
 
 

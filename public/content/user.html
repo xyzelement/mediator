@@ -64,14 +64,14 @@
       <!-- Main hero unit for a primary marketing message or call to action -->
       <!-- <div class="hero-unit"> -->
         
-      <h1><img src="{{=it.users[it.user_id].pictureUrl}}" /> {{=it.users[it.user_id].displayName}}</h1>
+      <h1><img src="{{=it.user}}" /> {{=it.user}}</h1>
         
       <legend>Arguments you are in</legend>
 
         {{ for(var t in it.topics) { }}
-          <h4><a href="/read?topic={{=it.topics[t]._id}}">{{=it.topics[t].subject}} &raquo;</a></h4>
-          <b>{{=it.topics[t].status}}</b>
-          between {{=it.users[it.topics[t].from].displayName}} and {{=it.users[it.topics[t].to].displayName}}
+          <h4><a href="/read?topic={{=it.topics[t]._id}}">{{=it.topics[t].topic}} &raquo;</a></h4>
+          <b>{{=it.topics[t].state}}</b>
+          between {{=it.topics[t]._creator.display_name}} and {{=it.topics[t].defendent_id.display_name}}
           
         {{ } }}
 

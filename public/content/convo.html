@@ -62,7 +62,7 @@
         <div class="nav-collapse collapse">
           <ul class="nav">
             <li class="">
-              <a href="/user">{{=it.users[it.user_id].displayName}}</a>
+              <a href="/user">{{=it.user_id}}</a>
             </li>
             <li class="">
               <a href="/logout">Log Out</a>
@@ -80,22 +80,37 @@
   
   <div class="container-narrow">
 
-    <h2>{{= it.topic.subject}}</h2>
+    <h2>{{= it.mediation.topic}}</h2>
 
-    {{ for(var i in it.topic.arguments) { }}
-
+    
+    {{ for(i=0; i < it.mediation.comments.length; ++i) { }}
+      
       <div class="well well-small">
-        <img src="{{=it.users[it.topic.arguments[i].by].pictureUrl}}" class="img-rounded pull-left" width="30">
-        <strong class="pull-left"> &nbsp; {{=it.users[it.topic.arguments[i].by].displayName}}&nbsp;</strong> 
-        <span class="sstext-info">{{=it.whatever[it.topic.arguments[i].action]["Recap"]}}</span>: <br/><br/>
+      [[{{=i}}]]
+        <img src="{{=it.user_id}}" class="img-rounded pull-left" width="30">
+        <strong class="pull-left"> &nbsp; {{=it.user_id}}&nbsp;</strong> 
+        
 
         <blockquote class="lead">
-          {{=it.topic.arguments[i].text}}        
+          {{=it.mediation.comments[i].text}}        
         </blockquote>
       </div>
     {{ } }}
     
+    
 
+ 	      {{ for(var i = 0; i< it.mediation.nextActions().length; ++i) { }}
+	        <a data-id="{{=it.mediation.nextActions()[i]}}"
+	           data-button="{{=it.mediation.nextActions()[i]}}"  
+	           data-command="{{=it.mediation.nextActions()[i]}}"  
+	           class="open-the-modal btn btn-success btn-large">
+	           <i class="icon-ok-circle icon-white"></i>
+	           &nbsp;{{=it.mediation.nextActions()[i]}}
+	        </a>
+	
+	      {{ } }}   
+   
+    
 
         <div id="myModal2" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-header">
@@ -105,7 +120,7 @@
             <div class="modal-body">
                 <form class="form-search" method="post" action="/add_comment">
                     <p id="popup_instructions">Please say something...</p>
-                    <input name="topic" type="hidden" value="{{=it.topic._id}}"/>
+                    <input name="topic" type="hidden" value="{{=it.mediation._id}}"/>
                     <textarea name="says" placeholder="..." class="input-block-level" rows="3"></textarea>
                     <input type="hidden" name="action" id="action" value="">
 
@@ -114,16 +129,7 @@
             </div>
         </div>
 
-      {{ for(var i in it.topic.next_actions) { }}
-        <a data-id="{{=it.topic.next_actions[i].action}}"
-           data-button="{{=it.whatever[it.topic.next_actions[i].action]["Button"]}}"  
-           data-command="{{=it.whatever[it.topic.next_actions[i].action]["Command"]}}"  
-           class="open-the-modal btn btn-success btn-large">
-           <i class="icon-ok-circle icon-white"></i>
-           &nbsp;{{=it.whatever[it.topic.next_actions[i].action]["Button"]}}
-        </a>
-
-      {{ } }}   
+        <!-- the next actions stuff -->
 </div>
 
 
