@@ -85,7 +85,7 @@
     
     {{ for(i=0; i < it.mediation.comments.length; ++i) { }}
       
-      <div class="well well-small">
+      <div class="well">
         <img src="{{=it.mediation.comments[i].user.getPictureUrl()}}" 
           class="img-rounded pull-left" width="30">
         <strong class="pull-left"> &nbsp; {{=it.mediation.comments[i].user.display_name}}&nbsp;</strong> 
@@ -98,12 +98,15 @@
     
 
  	      {{ for(var i = 0; i< it.mediation.nextActions().length; ++i) { }}
+          <!-- id: what goes back to server. 
+               button is what's show on top, 
+               command is instructions-->
 	        <a data-id="{{=it.mediation.nextActions()[i]}}"
-	           data-button="{{=it.mediation.nextActions()[i]}}"  
-	           data-command="{{=it.mediation.nextActions()[i]}}"  
+	           data-button="{{=it.mediation.getButtonText(it.mediation.nextActions()[i])}}"  
+	           data-command="{{=it.mediation.getCommandText(it.mediation.nextActions()[i])}}"  
 	           class="open-the-modal btn btn-success btn-large">
 	           <i class="icon-ok-circle icon-white"></i>
-	           &nbsp;{{=it.mediation.nextActions()[i]}}
+	           &nbsp;{{=it.mediation.getButtonText(it.mediation.nextActions()[i])}}
 	        </a>
 	
 	      {{ } }}   

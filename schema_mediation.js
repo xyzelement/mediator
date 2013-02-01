@@ -1,6 +1,35 @@
 var mongoose = require('mongoose');
 var util = require("util");
 
+function stateFromAction(action) {
+    switch (action) {
+    case "Start"    : return "Alleged";    
+    case "Restate"  : return "Restated";   
+    case "Question" : return "Questioned"; 
+    case "Clarify"  : return "Alleged";    
+    case "Accept"   : return "Accepted";   
+    default         : console.log("ERROR: unknown action: " + comment.action);
+    }  
+}
+
+var action_labels = {
+  "Start" :    { "Recap"   : "started a mediation",
+                 "Button"  : "You should never see this button!",
+                 "Command" : "You should never see this info!"},
+  "Restate" :  { "Recap"   : "restated the issue in their own words",
+                 "Button"  : "I think I understand",
+                 "Command" : "In order to make sure you are talking about the same thing, please restate the issue in your own words." },
+  "Question" : { "Recap"   : "requested more information",
+                 "Button"  : "I need to know more",
+                 "Command" : "It's great that you need more information. Please be as specific as possible about what you require." },
+  "Clarify" :  { "Recap"   : "provided more information",
+                 "Button"  : "Let me clarify",
+                 "Command" : "Please provide a clarification here. This is a great opportunity to make sure everone's on the same page." },
+  "Accept" :   { "Recap"   : "agrees with the restatement of the issue",
+                 "Button"  : "Exactly",
+                 "Command" : "It's great that we're on the same page! State it and let's move on to resolution." },
+};
+
 exports.addSchema = function () {
   // COMMENT
   var commentSchema = mongoose.Schema({
@@ -26,28 +55,38 @@ exports.addSchema = function () {
     topic:         String,
   });
   
-  mediationSchema.methods.addComment = function(comment) {
+
   
+  mediationSchema.methods.addComment = function(comment) {
     // Identify who will be next to speak
     if      (comment.user.equals(this._creator))       this.next_to_speak = "defendent";
     else if (comment.user.equals(this.defendent_id))   this.next_to_speak = "plaintif";
     else    console.log("ERROR: who's this comment by", comment.user)
 
     // Identify the state of the mediation
-    switch (comment.action) {
-    case "Start"    : this.state = "Alleged";    break;
-    case "Restate"  : this.state = "Restated";   break;
-    case "Question" : this.state = "Questioned"; break;
-    case "Clarify"  : this.state = "Alleged";    break;
-    case "Accept"   : this.state = "Accepted";   break;
-    default         : console.log("ERROR: unknown action: " + comment.action);
-    }    
-      
+    this.state = this.stateFromActiion(comment.action);         
     this.comments.push(comment);
   }
   
+
+
+  mediationSchema.methods.getButtonText = function(action) {
+    return action_labels[action].Button;
+  }
+  
+  mediationSchema.methods.getCommandText = function(action) {
+    return action_labels[action].Command;
+  }
+  
   mediationSchema.methods.nextActions = function () {
-    return ["Blow me", "Not gonna blow you"];
+    switch(this.state) {
+      case "Alleged":    return [ "Restate", "Question" ]; 
+      case "Questioned": return [ "Clarify" ];
+      case "Restated":   return [ "Accept", "Clarify"];
+      default: 
+          console.log("Unknow status: " + this.status);
+          return []
+    }  
   }
   
   mediationSchema.methods.toString = function() {
@@ -86,7 +125,7 @@ exports.addCommentById = function (mediation_id, user_id, text, action, cb) {
                                        action: action         });
   
   exports.Mediation.findByIdAndUpdate(mediation_id, 
-    { $push: { comments: comment }}, 
+    { $push: { comments: comment } , state: stateFromAction(action)}, 
     function(err,med) {
       if (err) 
         console.log("Error adding comment: ", mediation_id, user_id, text, action)
