@@ -1,0 +1,48 @@
+<html>
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <title>jQuery Example</title>
+    <script>
+        $(document).ready(function() {
+            $.ajaxSetup({ cache: true });
+            $.getScript('//connect.facebook.net/en_UK/all.js', function(){
+                FB.init({
+                    appId: '103675439800589',
+                    channelUrl: '//yourapp.com/channel.html'
+                });
+                $('#loginbutton,#feedbutton').removeAttr('disabled');
+                FB.getLoginStatus(function(x) {
+                    //EMTODO: check for failure
+                    //alert(""+ x.authResponse.userID);
+                    FB.api('/me', function(response) {
+                        //alert(response.name);
+                        $(".userInfo").html('<img src="https://graph.facebook.com/'
+                                + response.id + '/picture" />');
+                    });
+
+                    FB.ui(
+                            {
+                                method: 'apprequests',
+                                message: 'My Great Request',
+                                max_recipients:1
+                            }
+                            ,
+                            function(x) {
+                                //alert(x.to);
+                                $(".vsInfo").html('<img src="https://graph.facebook.com/'
+                                        + x.to + '/picture" />');
+
+                            }
+                    )
+                });
+
+
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="userInfo">User Info Goes here</div>
+    <div class="vsInfo">User Info Goes here</div>
+</body>
+</html>
